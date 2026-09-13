@@ -1,0 +1,1 @@
+(function(){document.querySelectorAll('[data-clock]').forEach(function(el){var start=Date.now();setInterval(function(){var s=Math.floor((Date.now()-start)/1000),m=String(Math.floor(s/60)).padStart(2,'0'),x=String(s%60).padStart(2,'0');el.textContent=m+':'+x},1000)})})();
