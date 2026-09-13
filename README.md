@@ -1,9 +1,9 @@
-# Live Overlays
+# Wonderland Live — Alice VTuber
 
-Coleção de overlays web para usar como Browser Source no OBS e publicar no GitHub Pages. Cada cena está em sua própria pasta; abra `index.html` na pasta escolhida ou use a URL correspondente no OBS.
+Overlays em HTML/CSS/JS para Browser Source no OBS, com direção visual inspirada em Alice no País das Maravilhas em uma estética VTuber anime. A paleta usa lilás, roxo pastel, preto e branco. As animações são feitas com [GSAP](https://gsap.com/) via CDN e CSS, mantendo as telas independentes e fáceis de usar no GitHub Pages.
 
 ## Cenas
 
 `0-iniciando` · `1-entrada` · `2-chat` · `3-gameplay` · `4-reacts` · `5-intermissao` · `6-colabs` · `7-ja-volto` · `8-final` · `9-emergencia`
 
-A cena 5 é uma intermissão de transição para completar o fluxo de 10 cenas. Todas as telas são responsivas, não dependem de build e têm efeitos CSS leves para preservar performance.
+Abra uma pasta como Browser Source no OBS. Para publicar, use GitHub Pages com a branch `main` e a pasta `/ (root)`.
