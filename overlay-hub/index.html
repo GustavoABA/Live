@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="color-scheme" content="dark">
+  <title>NihilGuh — Overlay Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="overlay-root" aria-label="NihilGuh Overlay Hub">
+    <section id="external-overlays" aria-hidden="true"></section>
+
+    <section id="partner-layer" aria-live="polite" aria-atomic="true">
+      <div class="partner-spark partner-spark-a">✦</div>
+      <div class="partner-spark partner-spark-b">♠</div>
+      <div class="partner-spark partner-spark-c">♥</div>
+
+      <article id="partner-card" class="partner-card" aria-hidden="true">
+        <div class="partner-glow"></div>
+        <div class="partner-avatar-wrap">
+          <img id="partner-avatar" class="partner-avatar" alt="" referrerpolicy="no-referrer">
+          <span id="partner-avatar-fallback" class="partner-avatar-fallback">♛</span>
+        </div>
+
+        <div class="partner-copy">
+          <span class="partner-kicker">PARCEIRO DE LIVE NO CHAT</span>
+          <strong id="partner-name" class="partner-name">@parceiro</strong>
+          <span id="partner-meta" class="partner-meta">COMUNIDADE NIHILGUH</span>
+        </div>
+
+        <div class="partner-stamp" aria-hidden="true">
+          <span>LIVE</span>
+          <b>PARTNER</b>
+        </div>
+      </article>
+    </section>
+
+    <div id="hub-status" class="hub-status" aria-hidden="true"></div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="overlay.js"></script>
+</body>
+</html>
