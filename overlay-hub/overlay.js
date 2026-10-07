@@ -12,6 +12,7 @@
 
   var params = new URLSearchParams(window.location.search);
   var debugEnabled = params.get("debug") === "1" || cfg.debug === true;
+  var directId = String(params.get("direct") || "").trim().toLowerCase();
 
   // Por padrao os widgets externos ficam ATIVOS. Use ?embedExternal=0 apenas para desligar todos.
   var embedExternalParam = params.get("embedExternal");
@@ -47,6 +48,30 @@
     statusEl.classList.add("is-visible");
   }
 
+  function getConfiguredOverlays() {
+    return Array.isArray(cfg.overlays) ? cfg.overlays : [];
+  }
+
+  function runDirectOverlay() {
+    if (!directId) return false;
+
+    var overlays = getConfiguredOverlays();
+    var item = overlays.find(function (overlay) {
+      return String(overlay && overlay.id || "").trim().toLowerCase() === directId;
+    });
+
+    if (!item || item.enabled === false || !item.url) {
+      debug("Overlay direto nao encontrado: " + directId);
+      return false;
+    }
+
+    // IMPORTANTE: navega o Browser Source para o widget como documento principal,
+    // exatamente como quando a URL do provedor e colocada diretamente no OBS.
+    // Isto evita as limitacoes de widgets executados dentro de iframe.
+    window.location.replace(item.url);
+    return true;
+  }
+
   function shouldMountOverlay(item) {
     var id = String(item && item.id || "").trim().toLowerCase();
     if (!id) return true;
@@ -64,7 +89,7 @@
       return;
     }
 
-    var overlays = Array.isArray(cfg.overlays) ? cfg.overlays : [];
+    var overlays = getConfiguredOverlays();
     var mounted = 0;
 
     overlays.forEach(function (item, index) {
@@ -263,6 +288,10 @@
   }
 
   function init() {
+    // Modo de diagnostico: carrega um widget como documento principal, nao em iframe.
+    // Ex.: ?direct=livepix-alert
+    if (runDirectOverlay()) return;
+
     mountExternalOverlays();
     runQueryTest();
     poll();
