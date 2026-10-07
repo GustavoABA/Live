@@ -19,19 +19,36 @@
       overflow:hidden;
       pointer-events:none;
     }
+    .white-key-layer{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      pointer-events:none;
+      background:transparent!important;
+      isolation:isolate;
+      contain:paint;
+      transform:translateZ(0);
+      filter:url(#white-key);
+      -webkit-filter:url(#white-key);
+    }
+    .white-key-layer > .external-overlay{
+      filter:none!important;
+      -webkit-filter:none!important;
+    }
   </style>
-  <link rel="stylesheet" href="style.css?v=whitekey-1">
+  <link rel="stylesheet" href="style.css?v=whitekey-2">
 </head>
 <body style="background:transparent!important;background-color:rgba(0,0,0,0)!important;">
   <!--
-    O LivePix renderiza um fundo branco dentro do documento embutido.
-    Como ele e cross-origin, nao podemos alterar o CSS interno. Este filtro
-    atua no resultado visual inteiro do <object> e transforma apenas tons
-    quase brancos em transparencia, preservando o restante do alerta.
+    O conteudo do LivePix e cross-origin, entao nao podemos alterar o CSS interno.
+    O filtro abaixo trabalha no frame ja composto pelo Chromium: branco puro vira
+    alpha 0 e tons quase brancos recebem uma transicao curta de alpha.
   -->
   <svg class="overlay-filter-defs" aria-hidden="true" focusable="false">
     <defs>
-      <filter id="white-key" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <filter id="white-key" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
         <feColorMatrix
           in="SourceGraphic"
           result="white-mask-base"
@@ -42,7 +59,7 @@
             0 0 0 0 0
             -0.333333 -0.333333 -0.333333 0 1" />
         <feComponentTransfer in="white-mask-base" result="white-mask">
-          <feFuncA type="linear" slope="25" intercept="-1" />
+          <feFuncA type="linear" slope="32" intercept="-1.15" />
         </feComponentTransfer>
         <feComposite in="SourceGraphic" in2="white-mask" operator="in" />
       </filter>
@@ -80,7 +97,34 @@
     <div id="hub-status" class="hub-status" aria-hidden="true"></div>
   </main>
 
-  <script src="config.js?v=whitekey-1"></script>
-  <script src="overlay.js?v=whitekey-1"></script>
+  <script src="config.js?v=whitekey-2"></script>
+  <script src="overlay.js?v=whitekey-2"></script>
+  <script>
+    // OBS/CEF pode ignorar SVG filter aplicado diretamente em <object>.
+    // Aplicamos o filtro numa camada pai, forcando o Chromium a compor primeiro
+    // o documento externo e so depois executar o white-key na superficie final.
+    (function applyComposedWhiteKey(){
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('whiteKey') === '0') return;
+
+      var objects = document.querySelectorAll('#external-overlays > object.external-overlay[data-white-key="true"]');
+      objects.forEach(function(object){
+        var parent = object.parentNode;
+        if (!parent || parent.classList.contains('white-key-layer')) return;
+
+        var layer = document.createElement('div');
+        layer.className = 'white-key-layer';
+        layer.dataset.overlayId = object.dataset.overlayId || '';
+        layer.style.zIndex = object.style.zIndex || '1';
+
+        object.style.zIndex = '0';
+        object.style.filter = 'none';
+        object.style.webkitFilter = 'none';
+
+        parent.insertBefore(layer, object);
+        layer.appendChild(object);
+      });
+    })();
+  </script>
 </body>
 </html>
