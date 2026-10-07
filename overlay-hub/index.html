@@ -7,17 +7,35 @@
   <meta name="theme-color" content="rgba(0,0,0,0)">
   <title>NihilGuh — Overlay Hub</title>
   <style>
-    html,body,#overlay-root,#external-overlays,#partner-layer{
+    html,body,#overlay-root,#external-overlays,#partner-layer,#alert-layer{
       background:transparent!important;
       background-color:rgba(0,0,0,0)!important;
     }
     html,body{margin:0;width:100%;height:100%;overflow:hidden;}
   </style>
-  <link rel="stylesheet" href="style.css?v=direct-1">
+  <link rel="stylesheet" href="style.css?v=native-1">
+  <link rel="stylesheet" href="native-alerts.css?v=native-1">
 </head>
 <body style="background:transparent!important;background-color:rgba(0,0,0,0)!important;">
   <main id="overlay-root" aria-label="NihilGuh Overlay Hub">
     <section id="external-overlays" aria-hidden="true"></section>
+
+    <section id="alert-layer" aria-live="polite" aria-atomic="true">
+      <article id="native-alert" class="native-alert" aria-hidden="true">
+        <div id="native-alert-media" class="native-alert-media">
+          <img id="native-alert-image" alt="" referrerpolicy="no-referrer">
+          <video id="native-alert-video" playsinline></video>
+          <span class="native-alert-fallback">♛</span>
+        </div>
+        <div class="native-alert-copy">
+          <span id="native-alert-source" class="native-alert-source">ALERTA</span>
+          <strong id="native-alert-title" class="native-alert-title">Novo evento</strong>
+          <span id="native-alert-message" class="native-alert-message"></span>
+          <span id="native-alert-amount" class="native-alert-amount"></span>
+        </div>
+        <audio id="native-alert-audio" playsinline></audio>
+      </article>
+    </section>
 
     <section id="partner-layer" aria-live="polite" aria-atomic="true">
       <div class="partner-spark partner-spark-a">✦</div>
@@ -47,7 +65,8 @@
     <div id="hub-status" class="hub-status" aria-hidden="true"></div>
   </main>
 
-  <script src="config.js?v=direct-1"></script>
-  <script src="overlay.js?v=direct-1"></script>
+  <script src="config.js?v=native-1"></script>
+  <script src="overlay.js?v=native-1"></script>
+  <script src="native-alerts.js?v=native-1"></script>
 </body>
 </html>
