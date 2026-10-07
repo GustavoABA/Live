@@ -12,7 +12,23 @@
 
   var params = new URLSearchParams(window.location.search);
   var debugEnabled = params.get("debug") === "1" || cfg.debug === true;
-  var embedExternal = params.get("embedExternal") === "1" || cfg.embedExternal === true;
+
+  // Por padrao os widgets externos ficam ATIVOS. Use ?embedExternal=0 apenas para desligar todos.
+  var embedExternalParam = params.get("embedExternal");
+  var embedExternal = embedExternalParam === null
+    ? cfg.embedExternal !== false
+    : embedExternalParam !== "0";
+
+  var onlyIds = String(params.get("only") || "")
+    .split(",")
+    .map(function (value) { return value.trim().toLowerCase(); })
+    .filter(Boolean);
+
+  var excludedIds = String(params.get("exclude") || "")
+    .split(",")
+    .map(function (value) { return value.trim().toLowerCase(); })
+    .filter(Boolean);
+
   var partnerCfg = cfg.partner || {};
   var endpoint = params.get("endpoint") || partnerCfg.endpoint || "";
   var pollMs = Math.max(600, Number(partnerCfg.pollMs) || 1000);
@@ -31,32 +47,49 @@
     statusEl.classList.add("is-visible");
   }
 
+  function shouldMountOverlay(item) {
+    var id = String(item && item.id || "").trim().toLowerCase();
+    if (!id) return true;
+    if (onlyIds.length && onlyIds.indexOf(id) === -1) return false;
+    if (excludedIds.indexOf(id) !== -1) return false;
+    return true;
+  }
+
   function mountExternalOverlays() {
+    if (!overlayHost) return;
+    overlayHost.replaceChildren();
+
     if (!embedExternal) {
-      if (overlayHost) overlayHost.replaceChildren();
-      debug("Overlays externos por iframe desativados para preservar transparencia.");
+      debug("Overlays externos desativados por ?embedExternal=0");
       return;
     }
 
     var overlays = Array.isArray(cfg.overlays) ? cfg.overlays : [];
+    var mounted = 0;
 
     overlays.forEach(function (item, index) {
-      if (!item || item.enabled === false || !item.url) return;
+      if (!item || item.enabled === false || !item.url || !shouldMountOverlay(item)) return;
 
       var frame = document.createElement("iframe");
       frame.className = "external-overlay";
+      frame.dataset.overlayId = item.id || String(index);
       frame.title = item.label || item.id || ("Overlay externo " + (index + 1));
       frame.src = item.url;
       frame.style.zIndex = String(Number(item.zIndex) || (index + 1));
       frame.style.background = "transparent";
-      frame.style.backgroundColor = "transparent";
+      frame.style.backgroundColor = "rgba(0,0,0,0)";
       frame.setAttribute("allow", "autoplay; fullscreen");
       frame.setAttribute("allowtransparency", "true");
       frame.setAttribute("scrolling", "no");
       frame.setAttribute("aria-hidden", "true");
+      frame.setAttribute("loading", "eager");
+      frame.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
       frame.tabIndex = -1;
       overlayHost.appendChild(frame);
+      mounted += 1;
     });
+
+    debug("Overlays externos ativos: " + mounted);
   }
 
   function normalizePartner(payload) {
