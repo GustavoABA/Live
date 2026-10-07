@@ -253,6 +253,22 @@ body { color: var(--ink); font-family: var(--sans); }
 .fade-up { animation: fade-up .9s cubic-bezier(.22, .72, .22, 1) both; }
 .d2 { animation-delay: .13s; }
 .d3 { animation-delay: .24s; }
+.gsap-ready .backdrop,
+.gsap-ready .stars i,
+.gsap-ready .ornament-border,
+.gsap-ready .brand::after,
+.gsap-ready .rule,
+.gsap-ready .countdown,
+.gsap-ready .character,
+.gsap-ready .mote,
+.gsap-ready .shooting-star,
+.gsap-ready .fade-up,
+.gsap-ready .scene::before,
+.gsap-ready .scene::after,
+.gsap-ready .scene[data-scene='0'] .title { animation: none; }
+.gsap-ready .fade-up { opacity: 1; translate: 0 0; }
+.gsap-ready .title-word { display: inline-block; will-change: transform, opacity; }
+.motion-off .fade-up { animation: none !important; opacity: 1 !important; translate: 0 0 !important; }
 .motion-off *, .motion-off *::before, .motion-off *::after,
 .obs-paused *, .obs-paused *::before, .obs-paused *::after { animation-play-state: paused !important; }
 
