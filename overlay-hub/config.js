@@ -4,14 +4,11 @@ window.OVERLAY_HUB_CONFIG = {
     height: 600
   },
 
-  // Importante: widgets como LivePix e StreamElements foram feitos para rodar
-  // como Browser Source de nivel superior no OBS. Alguns deles podem pintar
-  // o proprio iframe de branco ou bloquear embedding por politica do provedor.
-  // Por isso o hub NAO incorpora URLs externas por iframe por padrao.
-  // Para teste manual, use ?embedExternal=1 na URL do hub.
+  // A partir desta versao, o hub NAO depende de iframes externos para alertas.
+  // Os alertas sao renderizados pela propria pagina a partir de eventos.
   embedExternal: false,
 
-  // Mantemos as URLs aqui como referencia/configuracao central.
+  // URLs antigas ficam apenas como referencia. Nao sao carregadas automaticamente.
   overlays: [
     {
       id: "streamelements-alertbox",
@@ -43,9 +40,26 @@ window.OVERLAY_HUB_CONFIG = {
     }
   ],
 
+  nativeAlerts: {
+    // URL /exec do Google Apps Script que recebe os webhooks da LivePix
+    // e entrega a fila para esta pagina. Tambem pode usar ?endpoint=URL no OBS.
+    endpoint: "",
+    pollMs: 800,
+    displayMs: 6500,
+    maxQueue: 30
+  },
+
+  streamElements: {
+    // NUNCA publique token real neste arquivo. Passe no OBS por query string
+    // ou mantenha estes campos vazios e configure depois.
+    enabled: false,
+    channelId: "",
+    token: "",
+    tokenType: "jwt"
+  },
+
   partner: {
-    // Cole aqui a URL /exec do Google Apps Script quando publicar o backend.
-    // Tambem pode passar ?endpoint=URL na URL do Browser Source sem editar este arquivo.
+    // Mantem compatibilidade com o sistema de parceiros ja existente.
     endpoint: "",
     pollMs: 1000,
     visibleMs: 6000,
