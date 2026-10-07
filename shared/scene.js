@@ -1,1 +1,61 @@
-(()=>{const root=document.documentElement;const body=document.body;const timers=[...document.querySelectorAll('[data-stopwatch]')];const countdowns=[...document.querySelectorAll('[data-countdown]')];const eventCards=[...document.querySelectorAll('[data-event-card]')];let started=Date.now(),tickId,eventId;function fmt(sec){sec=Math.max(0,Math.floor(sec));const m=String(Math.floor(sec/60)).padStart(2,'0');const s=String(sec%60).padStart(2,'0');return `${m}:${s}`}function render(){const elapsed=(Date.now()-started)/1000;timers.forEach(el=>el.textContent=fmt(elapsed));countdowns.forEach(el=>{const mins=Number(new URLSearchParams(location.search).get('minutes')||el.dataset.countdown||10);el.textContent=fmt(mins*60-elapsed)});}function start(){if(!tickId){render();tickId=setInterval(render,1000)}if(eventCards.length&&!eventId){eventId=setInterval(()=>{const card=eventCards[Math.floor(Math.random()*eventCards.length)];card.classList.add('flash');setTimeout(()=>card.classList.remove('flash'),3600)},600000)}}function stop(){clearInterval(tickId);tickId=null;clearInterval(eventId);eventId=null}function visibility(){const hidden=document.hidden;body.classList.toggle('obs-paused',hidden);if(window.gsap?.globalTimeline)window.gsap.globalTimeline.paused(hidden);hidden?stop():start()}document.addEventListener('visibilitychange',visibility);window.addEventListener('pageshow',visibility);window.addEventListener('pagehide',stop);start();})();
+(() => {
+  const params = new URLSearchParams(location.search);
+  const body = document.body;
+  const timers = [...document.querySelectorAll('[data-stopwatch]')];
+  const countdowns = [...document.querySelectorAll('[data-countdown]')];
+  const characters = [...document.querySelectorAll('[data-character]')];
+  const started = Date.now();
+  let tickId;
+  let blinkId;
+
+  if (params.get('guide') === '1') body.classList.add('is-guide');
+  if (params.get('motion') === '0') body.classList.add('motion-off');
+
+  const formatTime = seconds => {
+    const safe = Math.max(0, Math.floor(seconds));
+    return `${String(Math.floor(safe / 60)).padStart(2, '0')}:${String(safe % 60).padStart(2, '0')}`;
+  };
+
+  const renderTimers = () => {
+    const elapsed = (Date.now() - started) / 1000;
+    timers.forEach(element => { element.textContent = formatTime(elapsed); });
+    countdowns.forEach(element => {
+      const minutes = Number(params.get('minutes') || element.dataset.countdown || 10);
+      element.textContent = formatTime(minutes * 60 - elapsed);
+    });
+  };
+
+  const scheduleBlink = () => {
+    clearTimeout(blinkId);
+    blinkId = setTimeout(() => {
+      characters.forEach(character => character.classList.add('is-blinking'));
+      setTimeout(() => characters.forEach(character => character.classList.remove('is-blinking')), 165);
+      scheduleBlink();
+    }, 2600 + Math.random() * 4200);
+  };
+
+  const start = () => {
+    if (!tickId) {
+      renderTimers();
+      tickId = setInterval(renderTimers, 1000);
+    }
+    if (characters.length && !body.classList.contains('motion-off')) scheduleBlink();
+  };
+
+  const stop = () => {
+    clearInterval(tickId);
+    clearTimeout(blinkId);
+    tickId = null;
+    blinkId = null;
+  };
+
+  const updateVisibility = () => {
+    body.classList.toggle('obs-paused', document.hidden);
+    document.hidden ? stop() : start();
+  };
+
+  document.addEventListener('visibilitychange', updateVisibility);
+  window.addEventListener('pageshow', updateVisibility);
+  window.addEventListener('pagehide', stop);
+  start();
+})();

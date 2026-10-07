@@ -1,7 +1,9 @@
-# Créditos de fundos
+# Assets
 
-`wonderland-castle.jpg` e `wonderland-castle-wide.jpeg` foram obtidos por busca em bancos públicos de imagens. A referência visual da direção é fantasia gótica roxa, castelo noturno e lua; verificar os termos da fonte antes de redistribuir fora deste projeto.
+Os arquivos `nihilguh-*` formam a identidade oficial Midnight Cat Club e foram criados a partir das referências visuais fornecidas para este projeto.
 
-Referências públicas consultadas:
-- Unsplash: https://unsplash.com/photos/a-castle-lit-up-at-night-with-the-moon-in-the-sky-photo-diAECIc23No
-- Pexels: https://www.pexels.com/photo/vajdahunyad-castle-at-night-in-budapest-hungary-30085179/
+- `nihilguh-night.png`: cenário noturno 16:9 com área central segura para cortes responsivos.
+- `nihilguh-character-open.png`: personagem e mascote recortados em PNG transparente.
+- `nihilguh-character-blink.png`: quadro de piscada/orelhas usado pela animação.
+
+Os arquivos `wonderland-castle*` permanecem no repositório por compatibilidade histórica, mas não são mais usados pelas cenas refatoradas.
