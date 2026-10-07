@@ -194,7 +194,7 @@ body { color: var(--ink); font-family: var(--sans); }
 .countdown::before { content: '☾'; color: var(--accent); font-size: .62em; }
 
 .character { position: absolute; z-index: 3; width: min(56vw, 960px); left: -3vw; bottom: -12vh; filter: drop-shadow(0 24px 36px rgba(0, 0, 0, .52)); animation: character-breathe 5.8s ease-in-out infinite; transform-origin: 45% 90%; }
-.character img { position: absolute; width: 100%; inset: auto auto 0 0; }
+.character img { position: absolute; width: 100%; inset: auto auto 0 0; transition: opacity 110ms ease-in-out; will-change: opacity; }
 .character .open { position: relative; display: block; }
 .character .blink { opacity: 0; }
 .character.is-blinking .open { opacity: 0; }

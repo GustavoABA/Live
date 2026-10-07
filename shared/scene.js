@@ -195,13 +195,14 @@
         const blink = character.querySelector('.blink');
         if (gsap && open && blink) {
           gsap.timeline()
-            .set(open, { autoAlpha: 0 })
-            .set(blink, { autoAlpha: 1 }, 0)
-            .set(open, { autoAlpha: 1 }, .16)
-            .set(blink, { autoAlpha: 0 }, .16);
+            .to(open, { autoAlpha: 0, duration: .085, ease: 'sine.inOut', overwrite: true })
+            .to(blink, { autoAlpha: 1, duration: .085, ease: 'sine.inOut', overwrite: true }, '<')
+            .to({}, { duration: .055 })
+            .to(open, { autoAlpha: 1, duration: .12, ease: 'sine.inOut', overwrite: true })
+            .to(blink, { autoAlpha: 0, duration: .12, ease: 'sine.inOut', overwrite: true }, '<');
         } else {
           character.classList.add('is-blinking');
-          setTimeout(() => character.classList.remove('is-blinking'), 165);
+          setTimeout(() => character.classList.remove('is-blinking'), 195);
         }
       });
       scheduleBlink();
