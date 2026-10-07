@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>NihilGuh Overlay Compositor</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body,#stage{position:absolute;inset:0;width:100%;height:100%;margin:0;overflow:hidden;background:transparent!important}
+    #stage{isolation:isolate}
+    .page-layer{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
+    #status{position:absolute;left:8px;bottom:8px;z-index:2147483647;display:none;padding:6px 8px;border-radius:6px;background:rgba(0,0,0,.72);color:#fff;font:11px/1.35 Consolas,monospace;white-space:pre-wrap;max-width:calc(100% - 16px)}
+    body.debug #status{display:block}
+  </style>
+</head>
+<body>
+  <div id="stage" aria-hidden="true"></div>
+  <div id="status"></div>
+  <script>
+    (()=>{
+      const params=new URLSearchParams(location.search);
+      const debug=params.get('debug')==='1';
+      if(debug) document.body.classList.add('debug');
+
+      const stage=document.getElementById('stage');
+      const status=document.getElementById('status');
+      const layers=new Map();
+      const media=new Map();
+      let socket=null;
+      let retry=null;
+      let canvas={width:800,height:600};
+
+      function log(text){
+        status.textContent=String(text||'');
+      }
+
+      function layerFor(id,zIndex){
+        if(layers.has(id)){
+          const el=layers.get(id);
+          el.style.zIndex=String(zIndex||1);
+          return el;
+        }
+        const img=new Image();
+        img.className='page-layer';
+        img.dataset.overlayId=id;
+        img.alt='';
+        img.draggable=false;
+        img.style.zIndex=String(zIndex||1);
+        stage.appendChild(img);
+        layers.set(id,img);
+        return img;
+      }
+
+      function syncHello(message){
+        canvas=message.canvas||canvas;
+        const valid=new Set((message.overlays||[]).map(item=>String(item.id)));
+        for(const [id,el] of layers){
+          if(valid.has(id)) continue;
+          el.remove();
+          layers.delete(id);
+        }
+        (message.overlays||[]).forEach(item=>layerFor(String(item.id),item.zIndex));
+        log(`Conectado · ${message.overlays?.length||0} paginas · ${canvas.width}x${canvas.height}`);
+      }
+
+      function playMedia(message){
+        if(!message.src || message.muted) return;
+        if(String(message.src).startsWith('blob:')) return;
+
+        const key=String(message.mediaId||`${message.overlayId}:${message.src}`);
+        const old=media.get(key);
+        if(old){ try{old.pause()}catch(e){} media.delete(key); }
+
+        const audio=new Audio(message.src);
+        audio.preload='auto';
+        audio.volume=Math.max(0,Math.min(1,Number(message.volume ?? 1)));
+        audio.loop=Boolean(message.loop);
+        if(Number(message.currentTime)>0){
+          audio.addEventListener('loadedmetadata',()=>{
+            try{audio.currentTime=Number(message.currentTime)||0}catch(e){}
+          },{once:true});
+        }
+        audio.addEventListener('ended',()=>media.delete(key),{once:true});
+        media.set(key,audio);
+        audio.play().catch(err=>log(`Audio bloqueado: ${err.message||err}`));
+      }
+
+      function stopMedia(message){
+        const key=String(message.mediaId||'');
+        const audio=media.get(key);
+        if(!audio) return;
+        try{audio.pause()}catch(e){}
+        media.delete(key);
+      }
+
+      function handle(message){
+        if(!message||typeof message!=='object') return;
+        if(message.type==='hello'){
+          syncHello(message);
+          return;
+        }
+        if(message.type==='frame'){
+          const img=layerFor(String(message.id),message.zIndex);
+          if(message.data) img.src=message.data;
+          return;
+        }
+        if(message.type==='media-play'){
+          playMedia(message);
+          return;
+        }
+        if(message.type==='media-stop'){
+          stopMedia(message);
+        }
+      }
+
+      function connect(){
+        clearTimeout(retry);
+        const proto=location.protocol==='https:'?'wss':'ws';
+        const explicit=params.get('ws');
+        const wsUrl=explicit||`${proto}://${location.host}/ws`;
+        log(`Conectando em ${wsUrl}...`);
+        try{ socket=new WebSocket(wsUrl); }
+        catch(error){ retry=setTimeout(connect,1500); return; }
+
+        socket.addEventListener('open',()=>log('Conectado ao compositor'));
+        socket.addEventListener('message',event=>{
+          try{ handle(JSON.parse(event.data)); }
+          catch(error){ if(debug) log(`Mensagem invalida: ${error.message||error}`); }
+        });
+        socket.addEventListener('close',()=>{
+          log('Compositor desconectado. Reconectando...');
+          retry=setTimeout(connect,1200);
+        });
+        socket.addEventListener('error',()=>{
+          try{socket.close()}catch(e){}
+        });
+      }
+
+      connect();
+    })();
+  </script>
+</body>
+</html>
