@@ -1,0 +1,14 @@
+{
+  "name": "nihilguh-overlay-compositor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Compositor local que carrega varios alertboxes como paginas Chromium independentes e envia uma saida unificada para o overlay hub.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "playwright": "latest",
+    "ws": "latest"
+  }
+}
