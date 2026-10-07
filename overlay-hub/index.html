@@ -12,10 +12,43 @@
       background-color:rgba(0,0,0,0)!important;
     }
     html,body{margin:0;width:100%;height:100%;overflow:hidden;}
+    .overlay-filter-defs{
+      position:absolute;
+      width:0;
+      height:0;
+      overflow:hidden;
+      pointer-events:none;
+    }
   </style>
-  <link rel="stylesheet" href="style.css?v=objects-1">
+  <link rel="stylesheet" href="style.css?v=whitekey-1">
 </head>
 <body style="background:transparent!important;background-color:rgba(0,0,0,0)!important;">
+  <!--
+    O LivePix renderiza um fundo branco dentro do documento embutido.
+    Como ele e cross-origin, nao podemos alterar o CSS interno. Este filtro
+    atua no resultado visual inteiro do <object> e transforma apenas tons
+    quase brancos em transparencia, preservando o restante do alerta.
+  -->
+  <svg class="overlay-filter-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="white-key" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+        <feColorMatrix
+          in="SourceGraphic"
+          result="white-mask-base"
+          type="matrix"
+          values="
+            0 0 0 0 0
+            0 0 0 0 0
+            0 0 0 0 0
+            -0.333333 -0.333333 -0.333333 0 1" />
+        <feComponentTransfer in="white-mask-base" result="white-mask">
+          <feFuncA type="linear" slope="25" intercept="-1" />
+        </feComponentTransfer>
+        <feComposite in="SourceGraphic" in2="white-mask" operator="in" />
+      </filter>
+    </defs>
+  </svg>
+
   <main id="overlay-root" aria-label="NihilGuh Overlay Hub">
     <section id="external-overlays" aria-hidden="true"></section>
 
@@ -47,7 +80,7 @@
     <div id="hub-status" class="hub-status" aria-hidden="true"></div>
   </main>
 
-  <script src="config.js?v=objects-1"></script>
-  <script src="overlay.js?v=objects-1"></script>
+  <script src="config.js?v=whitekey-1"></script>
+  <script src="overlay.js?v=whitekey-1"></script>
 </body>
 </html>
