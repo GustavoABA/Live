@@ -59,3 +59,77 @@ window.OVERLAY_HUB_CONFIG = {
 
   debug: false
 };
+
+// OBS/CEF pode ignorar filtros aplicados diretamente em <object> cross-origin.
+// Depois que overlay.js monta os alertboxes, trocamos os objetos por <embed>,
+// preservando cada URL como documento HTML completo e aplicando o white-key
+// na camada PAI ja composta pelo Chromium.
+(function () {
+  "use strict";
+
+  function findOverlay(id) {
+    var list = window.OVERLAY_HUB_CONFIG && window.OVERLAY_HUB_CONFIG.overlays;
+    if (!Array.isArray(list)) return null;
+    return list.find(function (item) {
+      return String(item && item.id || "") === String(id || "");
+    }) || null;
+  }
+
+  function upgradeExternalLayers() {
+    var objects = Array.from(document.querySelectorAll("object.external-overlay"));
+    if (!objects.length) return;
+
+    objects.forEach(function (oldObject) {
+      var id = oldObject.dataset.overlayId || "";
+      var item = findOverlay(id);
+      if (!item || !item.url || item.enabled === false) return;
+
+      var layer = document.createElement("div");
+      layer.className = "external-overlay-layer";
+      layer.dataset.overlayId = id;
+      layer.style.position = "absolute";
+      layer.style.inset = "0";
+      layer.style.width = "100%";
+      layer.style.height = "100%";
+      layer.style.overflow = "hidden";
+      layer.style.pointerEvents = "none";
+      layer.style.background = "transparent";
+      layer.style.backgroundColor = "rgba(0,0,0,0)";
+      layer.style.zIndex = String(Number(item.zIndex) || 1);
+      layer.style.isolation = "isolate";
+      layer.style.contain = "paint";
+      layer.style.transform = "translateZ(0)";
+      layer.style.willChange = "filter";
+
+      if (item.whiteKey === true) {
+        layer.style.filter = "url(#white-key)";
+        layer.style.webkitFilter = "url(#white-key)";
+      }
+
+      var embed = document.createElement("embed");
+      embed.className = "external-overlay external-overlay-embed";
+      embed.dataset.overlayId = id;
+      embed.type = "text/html";
+      embed.src = item.url;
+      embed.style.position = "absolute";
+      embed.style.inset = "0";
+      embed.style.width = "100%";
+      embed.style.height = "100%";
+      embed.style.border = "0";
+      embed.style.margin = "0";
+      embed.style.padding = "0";
+      embed.style.display = "block";
+      embed.style.overflow = "hidden";
+      embed.style.pointerEvents = "none";
+      embed.style.background = "transparent";
+      embed.style.backgroundColor = "rgba(0,0,0,0)";
+
+      layer.appendChild(embed);
+      oldObject.replaceWith(layer);
+    });
+  }
+
+  // config.js roda antes de overlay.js. O timeout executa depois que overlay.js
+  // terminou de montar todos os documentos externos.
+  window.setTimeout(upgradeExternalLayers, 0);
+})();
