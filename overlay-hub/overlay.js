@@ -12,6 +12,7 @@
 
   var params = new URLSearchParams(window.location.search);
   var debugEnabled = params.get("debug") === "1" || cfg.debug === true;
+  var embedExternal = params.get("embedExternal") === "1" || cfg.embedExternal === true;
   var partnerCfg = cfg.partner || {};
   var endpoint = params.get("endpoint") || partnerCfg.endpoint || "";
   var pollMs = Math.max(600, Number(partnerCfg.pollMs) || 1000);
@@ -31,6 +32,12 @@
   }
 
   function mountExternalOverlays() {
+    if (!embedExternal) {
+      if (overlayHost) overlayHost.replaceChildren();
+      debug("Overlays externos por iframe desativados para preservar transparencia.");
+      return;
+    }
+
     var overlays = Array.isArray(cfg.overlays) ? cfg.overlays : [];
 
     overlays.forEach(function (item, index) {
@@ -41,7 +48,10 @@
       frame.title = item.label || item.id || ("Overlay externo " + (index + 1));
       frame.src = item.url;
       frame.style.zIndex = String(Number(item.zIndex) || (index + 1));
+      frame.style.background = "transparent";
+      frame.style.backgroundColor = "transparent";
       frame.setAttribute("allow", "autoplay; fullscreen");
+      frame.setAttribute("allowtransparency", "true");
       frame.setAttribute("scrolling", "no");
       frame.setAttribute("aria-hidden", "true");
       frame.tabIndex = -1;
