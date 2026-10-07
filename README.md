@@ -33,7 +33,7 @@ Use a URL sem `guide=1` durante a transmissão. Os painéis e molduras continuam
 
 - `assets/nihilguh-night.png`: background principal, seguro para corte horizontal e vertical.
 - `assets/nihilguh-character-open.png`: recorte transparente do personagem.
-- `assets/nihilguh-character-blink.png`: quadro alternativo da piscada.
+- `assets/nihilguh-character-blink-v2.png`: quadro de pálpebras fechadas alinhado à pose original.
 - `shared/scene.css`: identidade, layouts e responsividade.
 - `shared/scene.js`: timers, parâmetros de URL, pausa quando a fonte está oculta e piscada orgânica.
 

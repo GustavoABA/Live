@@ -4,6 +4,6 @@ Os arquivos `nihilguh-*` formam a identidade oficial Midnight Cat Club e foram c
 
 - `nihilguh-night.png`: cenário noturno 16:9 com área central segura para cortes responsivos.
 - `nihilguh-character-open.png`: personagem e mascote recortados em PNG transparente.
-- `nihilguh-character-blink.png`: quadro de piscada/orelhas usado pela animação.
+- `nihilguh-character-blink-v2.png`: quadro de piscada alinhado à pose aberta; apenas as pálpebras mudam durante o crossfade.
 
 Os arquivos `wonderland-castle*` permanecem no repositório por compatibilidade histórica, mas não são mais usados pelas cenas refatoradas.

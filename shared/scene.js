@@ -188,23 +188,34 @@
     clearTimeout(blinkId);
     blinkId = setTimeout(() => {
       const gsap = window.gsap;
+      const doubleBlink = Math.random() < .16;
       characters.forEach(character => {
         const open = character.querySelector('.open');
         const blink = character.querySelector('.blink');
         if (gsap && open && blink) {
-          gsap.timeline()
-            .to(open, { autoAlpha: 0, duration: .085, ease: 'sine.inOut', overwrite: true })
-            .to(blink, { autoAlpha: 1, duration: .085, ease: 'sine.inOut', overwrite: true }, '<')
-            .to({}, { duration: .055 })
-            .to(open, { autoAlpha: 1, duration: .12, ease: 'sine.inOut', overwrite: true })
-            .to(blink, { autoAlpha: 0, duration: .12, ease: 'sine.inOut', overwrite: true }, '<');
+          const timeline = gsap.timeline();
+          const addBlink = position => {
+            timeline
+              .to(open, { autoAlpha: 0, duration: .095, ease: 'sine.inOut', overwrite: true }, position)
+              .to(blink, { autoAlpha: 1, duration: .095, ease: 'sine.inOut', overwrite: true }, '<')
+              .to({}, { duration: .05 })
+              .to(open, { autoAlpha: 1, duration: .13, ease: 'sine.inOut', overwrite: true })
+              .to(blink, { autoAlpha: 0, duration: .13, ease: 'sine.inOut', overwrite: true }, '<');
+          };
+
+          addBlink();
+          if (doubleBlink) addBlink('+=.11');
         } else {
           character.classList.add('is-blinking');
-          setTimeout(() => character.classList.remove('is-blinking'), 195);
+          setTimeout(() => character.classList.remove('is-blinking'), 225);
+          if (doubleBlink) {
+            setTimeout(() => character.classList.add('is-blinking'), 335);
+            setTimeout(() => character.classList.remove('is-blinking'), 560);
+          }
         }
       });
       scheduleBlink();
-    }, 2600 + Math.random() * 4200);
+    }, 3000 + Math.random() * 4500);
   };
 
   const start = () => {
