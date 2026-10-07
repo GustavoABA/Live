@@ -12,19 +12,10 @@
 
   var params = new URLSearchParams(window.location.search);
   var debugEnabled = params.get("debug") === "1" || cfg.debug === true;
-  var directId = String(params.get("direct") || "").trim().toLowerCase();
-
-  // Por padrao os widgets externos ficam ATIVOS. Use ?embedExternal=0 apenas para desligar todos.
-  var embedExternalParam = params.get("embedExternal");
-  var embedExternal = embedExternalParam === null
-    ? cfg.embedExternal !== false
-    : embedExternalParam !== "0";
-
   var onlyIds = String(params.get("only") || "")
     .split(",")
     .map(function (value) { return value.trim().toLowerCase(); })
     .filter(Boolean);
-
   var excludedIds = String(params.get("exclude") || "")
     .split(",")
     .map(function (value) { return value.trim().toLowerCase(); })
@@ -48,31 +39,7 @@
     statusEl.classList.add("is-visible");
   }
 
-  function getConfiguredOverlays() {
-    return Array.isArray(cfg.overlays) ? cfg.overlays : [];
-  }
-
-  function runDirectOverlay() {
-    if (!directId) return false;
-
-    var overlays = getConfiguredOverlays();
-    var item = overlays.find(function (overlay) {
-      return String(overlay && overlay.id || "").trim().toLowerCase() === directId;
-    });
-
-    if (!item || item.enabled === false || !item.url) {
-      debug("Overlay direto nao encontrado: " + directId);
-      return false;
-    }
-
-    // IMPORTANTE: navega o Browser Source para o widget como documento principal,
-    // exatamente como quando a URL do provedor e colocada diretamente no OBS.
-    // Isto evita as limitacoes de widgets executados dentro de iframe.
-    window.location.replace(item.url);
-    return true;
-  }
-
-  function shouldMountOverlay(item) {
+  function shouldMount(item) {
     var id = String(item && item.id || "").trim().toLowerCase();
     if (!id) return true;
     if (onlyIds.length && onlyIds.indexOf(id) === -1) return false;
@@ -84,42 +51,45 @@
     if (!overlayHost) return;
     overlayHost.replaceChildren();
 
-    if (!embedExternal) {
-      debug("Overlays externos desativados por ?embedExternal=0");
+    if (cfg.embedExternal === false) {
+      debug("Carregamento de alertboxes desativado no config.js");
       return;
     }
 
-    var overlays = getConfiguredOverlays();
+    var overlays = Array.isArray(cfg.overlays) ? cfg.overlays : [];
     var mounted = 0;
 
     overlays.forEach(function (item, index) {
-      if (!item || item.enabled === false || !item.url || !shouldMountOverlay(item)) return;
+      if (!item || item.enabled === false || !item.url || !shouldMount(item)) return;
 
-      var frame = document.createElement("iframe");
-      frame.className = "external-overlay";
-      frame.dataset.overlayId = item.id || String(index);
-      frame.title = item.label || item.id || ("Overlay externo " + (index + 1));
-      frame.src = item.url;
-      frame.style.zIndex = String(Number(item.zIndex) || (index + 1));
-      frame.style.background = "transparent";
-      frame.style.backgroundColor = "rgba(0,0,0,0)";
-      frame.setAttribute("allow", "autoplay; fullscreen");
-      frame.setAttribute("allowtransparency", "true");
-      frame.setAttribute("scrolling", "no");
-      frame.setAttribute("aria-hidden", "true");
-      frame.setAttribute("loading", "eager");
-      frame.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
-      frame.tabIndex = -1;
-      overlayHost.appendChild(frame);
+      // Nao usamos iframe aqui. Cada alertbox e carregado como documento HTML
+      // embutido por <object>, ocupando o mesmo canvas e empilhado por z-index.
+      var object = document.createElement("object");
+      object.className = "external-overlay";
+      object.dataset.overlayId = item.id || String(index);
+      object.type = "text/html";
+      object.data = item.url;
+      object.title = item.label || item.id || ("Alertbox " + (index + 1));
+      object.style.zIndex = String(Number(item.zIndex) || (index + 1));
+      object.style.background = "transparent";
+      object.style.backgroundColor = "rgba(0,0,0,0)";
+      object.setAttribute("aria-hidden", "true");
+      object.tabIndex = -1;
+
+      var fallback = document.createElement("span");
+      fallback.hidden = true;
+      fallback.textContent = item.label || item.id || "Alertbox";
+      object.appendChild(fallback);
+
+      overlayHost.appendChild(object);
       mounted += 1;
     });
 
-    debug("Overlays externos ativos: " + mounted);
+    debug("Alertboxes carregados: " + mounted);
   }
 
   function normalizePartner(payload) {
     if (!payload || typeof payload !== "object") return null;
-
     var nick = String(payload.nick || payload.username || "").trim();
     if (!nick) return null;
 
@@ -139,19 +109,13 @@
 
   function enqueuePartner(payload) {
     var partner = normalizePartner(payload);
-    if (!partner) return;
-
-    if (partner.id === lastEventId) return;
+    if (!partner || partner.id === lastEventId) return;
     lastEventId = partner.id;
 
     var key = partnerKey(partner);
     var now = Date.now();
     var lastSeen = recentPartners[key] || 0;
-
-    if (dedupeMs && (now - lastSeen) < dedupeMs) {
-      debug("Evento repetido ignorado: " + partner.name);
-      return;
-    }
+    if (dedupeMs && (now - lastSeen) < dedupeMs) return;
 
     recentPartners[key] = now;
     queue.push(partner);
@@ -159,9 +123,9 @@
   }
 
   function setAvatar(url) {
+    if (!partnerAvatar) return;
     partnerAvatar.classList.remove("is-ready");
     partnerAvatar.removeAttribute("src");
-
     if (!url) return;
 
     partnerAvatar.onload = function () {
@@ -176,6 +140,11 @@
 
   function showPartner(partner) {
     return new Promise(function (resolve) {
+      if (!partnerCard || !partnerLayer || !partnerName || !partnerMeta) {
+        resolve();
+        return;
+      }
+
       partnerName.textContent = partner.name.charAt(0) === "@" ? partner.name : ("@" + partner.name);
       partnerMeta.textContent = partner.platform + " · COMUNIDADE NIHILGUH";
       setAvatar(partner.avatar);
@@ -183,7 +152,6 @@
       partnerCard.classList.remove("is-entering", "is-visible", "is-leaving");
       partnerLayer.classList.remove("is-active");
       partnerCard.setAttribute("aria-hidden", "false");
-
       void partnerCard.offsetWidth;
       partnerLayer.classList.add("is-active");
       partnerCard.classList.add("is-entering");
@@ -210,7 +178,6 @@
   function drainQueue() {
     if (isAnimating || queue.length === 0) return;
     isAnimating = true;
-
     var next = queue.shift();
     showPartner(next).then(function () {
       isAnimating = false;
@@ -253,11 +220,7 @@
   }
 
   function poll() {
-    if (!endpoint) {
-      debug("Sem endpoint. Use ?endpoint=URL_DO_APPS_SCRIPT ou configure config.js");
-      return;
-    }
-
+    if (!endpoint) return;
     jsonp(
       endpoint,
       function (data) {
@@ -265,7 +228,6 @@
         pollTimer = window.setTimeout(poll, pollMs);
       },
       function () {
-        debug("Falha ao consultar o backend de parceiros. Tentando novamente...");
         pollTimer = window.setTimeout(poll, Math.max(2000, pollMs * 2));
       }
     );
@@ -273,8 +235,7 @@
 
   function runQueryTest() {
     var testNick = params.get("partner") || params.get("testPartner");
-    if (!testNick) return false;
-
+    if (!testNick) return;
     enqueuePartner({
       id: "query-test-" + Date.now(),
       nick: testNick,
@@ -283,27 +244,12 @@
       avatar: params.get("avatar") || "",
       timestamp: Date.now()
     });
-
-    return true;
   }
 
   function init() {
-    // Modo de diagnostico: carrega um widget como documento principal, nao em iframe.
-    // Ex.: ?direct=livepix-alert
-    if (runDirectOverlay()) return;
-
     mountExternalOverlays();
     runQueryTest();
     poll();
-
-    document.addEventListener("visibilitychange", function () {
-      if (document.hidden) {
-        if (pollTimer) window.clearTimeout(pollTimer);
-      } else if (endpoint) {
-        if (pollTimer) window.clearTimeout(pollTimer);
-        pollTimer = window.setTimeout(poll, 150);
-      }
-    });
   }
 
   init();
