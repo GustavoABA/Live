@@ -1,9 +1,8 @@
 <!doctype html>
-<html lang="pt-BR" style="background:transparent!important;background-color:rgba(0,0,0,0)!important;color-scheme:light;">
+<html lang="pt-BR" style="background:transparent!important;background-color:rgba(0,0,0,0)!important;color-scheme:normal;">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <meta name="color-scheme" content="light">
   <meta name="theme-color" content="rgba(0,0,0,0)">
   <title>NihilGuh — Overlay Hub</title>
   <style>
@@ -16,19 +15,24 @@
       width:100%;
       height:100%;
       overflow:hidden;
-      color-scheme:light;
+      color-scheme:normal!important;
     }
-    #external-overlays,
-    #external-overlays > object.external-overlay{
-      color-scheme:light!important;
-      forced-color-adjust:none!important;
+    #external-overlays{
+      color-scheme:normal!important;
       background:transparent!important;
       background-color:rgba(0,0,0,0)!important;
     }
+    #external-overlays > object.external-overlay{
+      color-scheme:normal!important;
+      forced-color-adjust:none!important;
+      background:transparent!important;
+      background-color:rgba(0,0,0,0)!important;
+      border:0!important;
+    }
   </style>
-  <link rel="stylesheet" href="style.css?v=canvas-scheme-1">
+  <link rel="stylesheet" href="style.css?v=scheme-normal-1">
 </head>
-<body style="background:transparent!important;background-color:rgba(0,0,0,0)!important;color-scheme:light;">
+<body style="background:transparent!important;background-color:rgba(0,0,0,0)!important;color-scheme:normal;">
   <main id="overlay-root" aria-label="NihilGuh Overlay Hub">
     <section id="external-overlays" aria-hidden="true"></section>
 
@@ -60,24 +64,22 @@
     <div id="hub-status" class="hub-status" aria-hidden="true"></div>
   </main>
 
-  <script src="config.js?v=canvas-scheme-1"></script>
-  <script src="overlay.js?v=canvas-scheme-1"></script>
+  <script src="config.js?v=scheme-normal-1"></script>
+  <script src="overlay.js?v=scheme-normal-1"></script>
   <script>
-    // O Chromium pode pintar o canvas de um documento embutido de branco quando
-    // o color-scheme do host nao combina com o documento interno. Mantemos o
-    // formato <object> (que ja reproduz os alertas) e corrigimos o canvas do host.
-    (function normalizeEmbeddedCanvas(){
+    (function normalizeEmbeddedColorScheme(){
       var host = document.getElementById('external-overlays');
       if (!host) return;
 
-      function normalize(object){
-        if (!(object instanceof HTMLObjectElement)) return;
-        object.style.filter = 'none';
-        object.style.webkitFilter = 'none';
-        object.style.colorScheme = 'light';
-        object.style.forcedColorAdjust = 'none';
-        object.style.background = 'transparent';
-        object.style.backgroundColor = 'rgba(0,0,0,0)';
+      function normalize(node){
+        if (!(node instanceof HTMLObjectElement)) return;
+        node.style.filter = 'none';
+        node.style.webkitFilter = 'none';
+        node.style.colorScheme = 'normal';
+        node.style.forcedColorAdjust = 'none';
+        node.style.background = 'transparent';
+        node.style.backgroundColor = 'rgba(0,0,0,0)';
+        node.style.border = '0';
       }
 
       host.querySelectorAll('object.external-overlay').forEach(normalize);
@@ -85,10 +87,9 @@
       new MutationObserver(function(records){
         records.forEach(function(record){
           record.addedNodes.forEach(function(node){
-            if (node && node.nodeType === 1) {
-              if (node.matches && node.matches('object.external-overlay')) normalize(node);
-              if (node.querySelectorAll) node.querySelectorAll('object.external-overlay').forEach(normalize);
-            }
+            if (!node || node.nodeType !== 1) return;
+            if (node.matches && node.matches('object.external-overlay')) normalize(node);
+            if (node.querySelectorAll) node.querySelectorAll('object.external-overlay').forEach(normalize);
           });
         });
       }).observe(host,{childList:true,subtree:true});
