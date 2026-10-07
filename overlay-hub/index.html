@@ -19,49 +19,60 @@
       overflow:hidden;
       pointer-events:none;
     }
-    .white-key-layer{
+    .svg-key-layer{
       position:absolute;
       inset:0;
       width:100%;
       height:100%;
-      overflow:hidden;
+      overflow:visible;
       pointer-events:none;
       background:transparent!important;
-      isolation:isolate;
-      contain:paint;
-      transform:translateZ(0);
-      filter:url(#white-key);
-      -webkit-filter:url(#white-key);
     }
-    .white-key-layer > .external-overlay{
-      filter:none!important;
-      -webkit-filter:none!important;
+    .svg-key-layer foreignObject,
+    .svg-key-layer .embed-host,
+    .svg-key-layer embed{
+      width:100%;
+      height:100%;
+      margin:0;
+      padding:0;
+      border:0;
+      background:transparent!important;
+    }
+    .svg-key-layer .embed-host{
+      position:absolute;
+      inset:0;
+      overflow:hidden;
+    }
+    .svg-key-layer embed{
+      display:block;
+      position:absolute;
+      inset:0;
     }
   </style>
-  <link rel="stylesheet" href="style.css?v=whitekey-2">
+  <link rel="stylesheet" href="style.css?v=whitekey-svg-1">
 </head>
 <body style="background:transparent!important;background-color:rgba(0,0,0,0)!important;">
   <!--
-    O conteudo do LivePix e cross-origin, entao nao podemos alterar o CSS interno.
-    O filtro abaixo trabalha no frame ja composto pelo Chromium: branco puro vira
-    alpha 0 e tons quase brancos recebem uma transicao curta de alpha.
+    O conteudo do LivePix e cross-origin. Em vez de aplicar o filtro diretamente
+    no <object>/<embed>, ele e renderizado dentro de um foreignObject SVG. O filtro
+    atua no foreignObject ja rasterizado, transformando branco em alpha.
   -->
   <svg class="overlay-filter-defs" aria-hidden="true" focusable="false">
     <defs>
       <filter id="white-key" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
         <feColorMatrix
           in="SourceGraphic"
-          result="white-mask-base"
+          result="alpha-from-white"
           type="matrix"
           values="
             0 0 0 0 0
             0 0 0 0 0
             0 0 0 0 0
             -0.333333 -0.333333 -0.333333 0 1" />
-        <feComponentTransfer in="white-mask-base" result="white-mask">
-          <feFuncA type="linear" slope="32" intercept="-1.15" />
+        <feComponentTransfer in="alpha-from-white" result="key-mask">
+          <feFuncA type="linear" slope="28" intercept="-0.85" />
         </feComponentTransfer>
-        <feComposite in="SourceGraphic" in2="white-mask" operator="in" />
+        <feComposite in="SourceGraphic" in2="key-mask" operator="in" />
       </filter>
     </defs>
   </svg>
@@ -97,32 +108,49 @@
     <div id="hub-status" class="hub-status" aria-hidden="true"></div>
   </main>
 
-  <script src="config.js?v=whitekey-2"></script>
-  <script src="overlay.js?v=whitekey-2"></script>
+  <script src="config.js?v=whitekey-svg-1"></script>
+  <script src="overlay.js?v=whitekey-svg-1"></script>
   <script>
-    // OBS/CEF pode ignorar SVG filter aplicado diretamente em <object>.
-    // Aplicamos o filtro numa camada pai, forcando o Chromium a compor primeiro
-    // o documento externo e so depois executar o white-key na superficie final.
-    (function applyComposedWhiteKey(){
+    (function rasterizeWhiteKeyOverlays(){
       var params = new URLSearchParams(window.location.search);
       if (params.get('whiteKey') === '0') return;
 
-      var objects = document.querySelectorAll('#external-overlays > object.external-overlay[data-white-key="true"]');
+      var SVG_NS = 'http://www.w3.org/2000/svg';
+      var objects = Array.from(document.querySelectorAll('#external-overlays > object.external-overlay[data-white-key="true"]'));
+
       objects.forEach(function(object){
-        var parent = object.parentNode;
-        if (!parent || parent.classList.contains('white-key-layer')) return;
+        var url = object.data || object.getAttribute('data');
+        if (!url || !object.parentNode) return;
 
-        var layer = document.createElement('div');
-        layer.className = 'white-key-layer';
-        layer.dataset.overlayId = object.dataset.overlayId || '';
-        layer.style.zIndex = object.style.zIndex || '1';
+        var svg = document.createElementNS(SVG_NS, 'svg');
+        svg.setAttribute('class', 'svg-key-layer');
+        svg.setAttribute('viewBox', '0 0 800 600');
+        svg.setAttribute('preserveAspectRatio', 'none');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.dataset.overlayId = object.dataset.overlayId || '';
+        svg.style.zIndex = object.style.zIndex || '1';
 
-        object.style.zIndex = '0';
-        object.style.filter = 'none';
-        object.style.webkitFilter = 'none';
+        var foreignObject = document.createElementNS(SVG_NS, 'foreignObject');
+        foreignObject.setAttribute('x', '0');
+        foreignObject.setAttribute('y', '0');
+        foreignObject.setAttribute('width', '800');
+        foreignObject.setAttribute('height', '600');
+        foreignObject.setAttribute('filter', 'url(#white-key)');
 
-        parent.insertBefore(layer, object);
-        layer.appendChild(object);
+        var host = document.createElement('div');
+        host.className = 'embed-host';
+        host.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+
+        var embed = document.createElement('embed');
+        embed.type = 'text/html';
+        embed.src = url;
+        embed.title = object.title || object.dataset.overlayId || 'Alertbox';
+        embed.setAttribute('aria-hidden', 'true');
+
+        host.appendChild(embed);
+        foreignObject.appendChild(host);
+        svg.appendChild(foreignObject);
+        object.parentNode.replaceChild(svg, object);
       });
     })();
   </script>
