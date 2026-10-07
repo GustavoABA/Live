@@ -106,8 +106,6 @@
 
     body.classList.add('gsap-ready');
     body.dataset.animationEngine = `gsap-${gsap.version}`;
-    gsap.defaults({ force3D: true });
-
     if (window.SplitText) gsap.registerPlugin(window.SplitText);
 
     const entrance = gsap.timeline({ defaults: { duration: .8, ease: 'power3.out' } });
