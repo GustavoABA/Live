@@ -12,6 +12,7 @@
 
   var params = new URLSearchParams(window.location.search);
   var debugEnabled = params.get("debug") === "1" || cfg.debug === true;
+  var whiteKeyEnabled = params.get("whiteKey") !== "0";
   var onlyIds = String(params.get("only") || "")
     .split(",")
     .map(function (value) { return value.trim().toLowerCase(); })
@@ -62,8 +63,8 @@
     overlays.forEach(function (item, index) {
       if (!item || item.enabled === false || !item.url || !shouldMount(item)) return;
 
-      // Nao usamos iframe aqui. Cada alertbox e carregado como documento HTML
-      // embutido por <object>, ocupando o mesmo canvas e empilhado por z-index.
+      // Cada alertbox e carregado como documento HTML embutido por <object>,
+      // ocupando o mesmo canvas e empilhado por z-index.
       var object = document.createElement("object");
       object.className = "external-overlay";
       object.dataset.overlayId = item.id || String(index);
@@ -73,6 +74,16 @@
       object.style.zIndex = String(Number(item.zIndex) || (index + 1));
       object.style.background = "transparent";
       object.style.backgroundColor = "rgba(0,0,0,0)";
+
+      // Alguns provedores (ex.: LivePix) pintam o documento embutido de branco.
+      // Nao podemos alterar o CSS interno por ser cross-origin, entao removemos
+      // apenas pixels quase brancos no resultado final do <object>.
+      if (whiteKeyEnabled && item.whiteKey === true) {
+        object.style.filter = "url(#white-key)";
+        object.style.webkitFilter = "url(#white-key)";
+        object.dataset.whiteKey = "true";
+      }
+
       object.setAttribute("aria-hidden", "true");
       object.tabIndex = -1;
 
