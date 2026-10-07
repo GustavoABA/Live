@@ -4,8 +4,14 @@ window.OVERLAY_HUB_CONFIG = {
     height: 600
   },
 
-  // Overlays externos empilhados na mesma Browser Source.
-  // IDs devem ser unicos para facilitar debug/manutencao.
+  // Importante: widgets como LivePix e StreamElements foram feitos para rodar
+  // como Browser Source de nivel superior no OBS. Alguns deles podem pintar
+  // o proprio iframe de branco ou bloquear embedding por politica do provedor.
+  // Por isso o hub NAO incorpora URLs externas por iframe por padrao.
+  // Para teste manual, use ?embedExternal=1 na URL do hub.
+  embedExternal: false,
+
+  // Mantemos as URLs aqui como referencia/configuracao central.
   overlays: [
     {
       id: "streamelements-alertbox",
