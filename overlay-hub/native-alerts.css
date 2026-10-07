@@ -1,0 +1,142 @@
+#alert-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  display: grid;
+  place-items: end center;
+  padding: 0 28px 34px;
+  background: transparent !important;
+}
+
+.native-alert {
+  position: relative;
+  width: min(680px, calc(100vw - 40px));
+  min-height: 138px;
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 17px 20px;
+  border: 1px solid rgba(222, 202, 255, .40);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 10% 15%, rgba(184, 150, 255, .22), transparent 34%),
+    linear-gradient(120deg, rgba(17, 10, 31, .97), rgba(8, 7, 15, .97) 62%, rgba(37, 17, 51, .96));
+  box-shadow: 0 24px 70px rgba(0,0,0,.48), 0 0 34px rgba(125,77,255,.18);
+  color: #f7f2ff;
+  opacity: 0;
+  transform: translateY(38px) scale(.96);
+  filter: blur(6px);
+  overflow: hidden;
+}
+
+.native-alert::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: linear-gradient(#ff6fcf, #8d68ff);
+  box-shadow: 0 0 24px rgba(255,111,207,.72);
+}
+
+.native-alert.is-entering { animation: nativeAlertIn 620ms cubic-bezier(.16,1,.3,1) forwards; }
+.native-alert.is-visible { opacity: 1; transform: translateY(0) scale(1); filter: none; }
+.native-alert.is-leaving { animation: nativeAlertOut 480ms cubic-bezier(.7,0,.84,0) forwards; }
+
+.native-alert-media {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(255,111,207,.18), rgba(125,77,255,.22));
+  border: 1px solid rgba(255,255,255,.12);
+  display: grid;
+  place-items: center;
+}
+
+.native-alert-media img,
+.native-alert-media video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.native-alert-media.has-image img { display: block; }
+.native-alert-media.has-video video { display: block; }
+.native-alert-media.has-image .native-alert-fallback,
+.native-alert-media.has-video .native-alert-fallback { display: none; }
+
+.native-alert-fallback {
+  font-family: Georgia, serif;
+  font-size: 44px;
+  color: #d8c7ff;
+  text-shadow: 0 0 22px rgba(184,150,255,.45);
+}
+
+.native-alert-copy { min-width: 0; }
+.native-alert-source {
+  display: block;
+  margin-bottom: 5px;
+  color: #ff79d2;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .23em;
+  text-transform: uppercase;
+}
+.native-alert-title {
+  display: block;
+  font: 700 clamp(24px, 4vw, 36px)/1 Georgia, "Times New Roman", serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.native-alert-message {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 8px;
+  color: #cfc2df;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.native-alert-amount {
+  display: inline-block;
+  margin-top: 9px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(184,150,255,.11);
+  border: 1px solid rgba(184,150,255,.22);
+  color: #e8ddff;
+  font-size: 12px;
+  font-weight: 800;
+}
+.native-alert-amount:empty,
+.native-alert-message:empty { display: none; }
+
+@keyframes nativeAlertIn {
+  0% { opacity:0; transform:translateY(40px) scale(.95); filter:blur(8px); }
+  62% { opacity:1; transform:translateY(-5px) scale(1.01); filter:blur(0); }
+  100% { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+}
+@keyframes nativeAlertOut {
+  from { opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+  to { opacity:0; transform:translateY(30px) scale(.97); filter:blur(5px); }
+}
+
+@media (max-width: 560px) {
+  #alert-layer { padding: 0 12px 18px; }
+  .native-alert { grid-template-columns: 76px minmax(0,1fr); min-height: 108px; padding: 13px 14px; gap: 12px; }
+  .native-alert-media { width: 70px; height: 70px; border-radius: 16px; }
+  .native-alert-title { font-size: 25px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .native-alert.is-entering,
+  .native-alert.is-leaving { animation-duration: 1ms !important; }
+}
