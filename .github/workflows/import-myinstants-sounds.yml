@@ -28,7 +28,7 @@ jobs:
 
       - name: Download sounds
         run: |
-          node <<'NODE'
+          node --input-type=commonjs <<'NODE'
           const fs = require('fs');
           const path = require('path');
           const { chromium } = require('playwright');
