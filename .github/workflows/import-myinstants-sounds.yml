@@ -15,145 +15,84 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Playwright
-        run: |
-          npm init -y >/dev/null 2>&1
-          npm install playwright@1.55.0 >/dev/null 2>&1
-          npx playwright install --with-deps chromium
-
       - name: Download sounds
+        shell: bash
         run: |
-          node --input-type=commonjs <<'NODE'
-          const fs = require('fs');
-          const path = require('path');
-          const { chromium } = require('playwright');
+          set +e
+          mkdir -p Sounds
 
-          (async () => {
-            const sources = [
-              'https://www.myinstants.com/pt/instant/fahhh-42300/',
-              'https://www.myinstants.com/pt/instant/voce-nao-tem-aura-559/',
-              'https://www.myinstants.com/pt/instant/maldito-traidor-17987/',
-              'https://www.myinstants.com/pt/instant/cala-boca-e-escuta-o-som-do-meu-corsa-11632/',
-              'https://www.myinstants.com/pt/instant/aiiii-aiii-aiiii-12809/',
-              'https://www.myinstants.com/pt/instant/brutal-acabou-pro-beta-globo-88904/',
-              'https://www.myinstants.com/pt/instant/papo-de-undaia-82584/',
-              'https://www.myinstants.com/pt/instant/o-nome-dele-e-bob-65961/',
-              'https://www.myinstants.com/pt/instant/o-casal-mais-lindo-do-brasil-65726/',
-              'https://www.myinstants.com/pt/instant/ze-da-manga-97909/',
-              'https://www.myinstants.com/pt/instant/peteco-peteco-2343/',
-              'https://www.myinstants.com/pt/instant/bruh/',
-              'https://www.myinstants.com/pt/instant/seu-madruga-nossa-lento-47-50113/',
-              'https://www.myinstants.com/pt/instant/vai-novinha-lula-e-bolsonaro-57201/',
-              'https://www.myinstants.com/pt/instant/toma-milk-shake-de-morango-59364/',
-              'https://www.myinstants.com/pt/instant/cade-meu-pix-89377/',
-              'https://www.myinstants.com/pt/instant/papoi-65557/',
-              'https://www.myinstants.com/pt/instant/vai-na-paz-irmao-91945/',
-              'https://www.myinstants.com/pt/instant/faz-meu-pix-comprar-feijao-estevao-ferreira-11980/',
-              'https://www.myinstants.com/pt/instant/som-buzina-estourado-80490/',
-              'https://www.myinstants.com/pt/instant/smzinho-eu-e-voce-2721/',
-              'https://www.myinstants.com/pt/instant/vou-resumir-em-duas-palavras-para-bens-15025/',
-              'https://www.myinstants.com/pt/instant/musica-do-chaves-25926/',
-              'https://www.myinstants.com/pt/instant/fala-comigo-bebe-12438/',
-              'https://www.myinstants.com/pt/instant/ai-que-nao-sei-oque-cala-boca-91787/',
-              'https://www.myinstants.com/pt/instant/soundpad-37229/',
-              'https://www.myinstants.com/pt/instant/ai-voce-ta-demonstrando-a-essencia-12632/',
-              'https://www.myinstants.com/pt/instant/maldito-traidor-70615/',
-              'https://www.myinstants.com/pt/instant/eu-gosto-e-assim-amostradinho-87139/',
-              'https://www.myinstants.com/pt/instant/peguei-o-esquema-smzinho-38651/',
-              'https://www.myinstants.com/pt/instant/agora-deu-o-caraio-memo-20772/',
-              'https://www.myinstants.com/pt/instant/cativeiro-43348/',
-              'https://www.myinstants.com/pt/instant/bom-dia-pra-quem-quiser-61923/'
-            ];
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36'
 
-            fs.mkdirSync('Sounds', { recursive: true });
+          download() {
+            local out="$1"
+            local url="$2"
+            local referer="$3"
+            echo "[GET] $out <- $url"
+            if curl -fL --retry 2 --retry-delay 1 --connect-timeout 15 --max-time 60 \
+              -A "$UA" \
+              -H 'Accept: audio/mpeg,audio/*;q=0.9,*/*;q=0.8' \
+              -H 'Accept-Language: pt-BR,pt;q=0.9,en;q=0.8' \
+              -e "$referer" \
+              "$url" -o "Sounds/$out"; then
+              bytes=$(wc -c < "Sounds/$out")
+              if [ "$bytes" -gt 100 ]; then
+                echo "[OK] $out ($bytes bytes)"
+              else
+                echo "[FAIL] $out: arquivo pequeno demais"
+                rm -f "Sounds/$out"
+              fi
+            else
+              echo "[FAIL] $out"
+              rm -f "Sounds/$out"
+            fi
+          }
 
-            const browser = await chromium.launch({ headless: true });
-            const context = await browser.newContext({
-              userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
-              locale: 'pt-BR'
-            });
+          # O Fahhh já possui um espelho público funcional no GitHub.
+          download 'fahhh-42300.mp3' 'https://raw.githubusercontent.com/juppfy/faah-n8n-error/main/public/fahhh_KcgAXfs.mp3' 'https://github.com/'
 
-            const failed = [];
+          download 'voce-nao-tem-aura-559.mp3' 'https://www.myinstants.com/media/sounds/voce-nao-tem-aura.mp3' 'https://www.myinstants.com/pt/instant/voce-nao-tem-aura-559/'
+          download 'maldito-traidor-17987.mp3' 'https://www.myinstants.com/media/sounds/maldito-traidor.mp3' 'https://www.myinstants.com/pt/instant/maldito-traidor-17987/'
+          download 'cala-boca-e-escuta-o-som-do-meu-corsa-11632.mp3' 'https://www.myinstants.com/media/sounds/cala-boca-e-escuta-o-som-do-meu-corsa.mp3' 'https://www.myinstants.com/pt/instant/cala-boca-e-escuta-o-som-do-meu-corsa-11632/'
+          download 'aiiii-aiii-aiiii-12809.mp3' 'https://www.myinstants.com/media/sounds/aiiii-aiii-aiiii.mp3' 'https://www.myinstants.com/pt/instant/aiiii-aiii-aiiii-12809/'
+          download 'brutal-acabou-pro-beta-globo-88904.mp3' 'https://www.myinstants.com/media/sounds/brutal-acabou-pro-beta-globo.mp3' 'https://www.myinstants.com/pt/instant/brutal-acabou-pro-beta-globo-88904/'
+          download 'papo-de-undaia-82584.mp3' 'https://www.myinstants.com/media/sounds/papo-de-undaia.mp3' 'https://www.myinstants.com/pt/instant/papo-de-undaia-82584/'
+          download 'o-nome-dele-e-bob-65961.mp3' 'https://www.myinstants.com/media/sounds/o-nome-dele-e-bob.mp3' 'https://www.myinstants.com/pt/instant/o-nome-dele-e-bob-65961/'
+          download 'o-casal-mais-lindo-do-brasil-65726.mp3' 'https://www.myinstants.com/media/sounds/o-casal-mais-lindo-do-brasil.mp3' 'https://www.myinstants.com/pt/instant/o-casal-mais-lindo-do-brasil-65726/'
+          download 'ze-da-manga-97909.mp3' 'https://www.myinstants.com/media/sounds/ze-da-manga_G3QwWGi.mp3' 'https://www.myinstants.com/pt/instant/ze-da-manga-97909/'
+          download 'peteco-peteco-2343.mp3' 'https://www.myinstants.com/media/sounds/peteco-peteco.mp3' 'https://www.myinstants.com/pt/instant/peteco-peteco-2343/'
+          download 'bruh.mp3' 'https://www.myinstants.com/media/sounds/movie_1.mp3' 'https://www.myinstants.com/pt/instant/bruh/'
+          download 'seu-madruga-nossa-lento-47-50113.mp3' 'https://www.myinstants.com/media/sounds/seu-madruga-nossa-lento-47.mp3' 'https://www.myinstants.com/pt/instant/seu-madruga-nossa-lento-47-50113/'
+          download 'vai-novinha-lula-e-bolsonaro-57201.mp3' 'https://www.myinstants.com/media/sounds/vai-novinha-lula-e-bolsonaro.mp3' 'https://www.myinstants.com/pt/instant/vai-novinha-lula-e-bolsonaro-57201/'
+          download 'toma-milk-shake-de-morango-59364.mp3' 'https://www.myinstants.com/media/sounds/toma-milk-shake-de-morango_bQhZ8mn.mp3' 'https://www.myinstants.com/pt/instant/toma-milk-shake-de-morango-59364/'
+          download 'cade-meu-pix-89377.mp3' 'https://www.myinstants.com/media/sounds/cade-meu-pix.mp3' 'https://www.myinstants.com/pt/instant/cade-meu-pix-89377/'
+          download 'papoi-65557.mp3' 'https://www.myinstants.com/media/sounds/papoi.mp3' 'https://www.myinstants.com/pt/instant/papoi-65557/'
+          download 'vai-na-paz-irmao-91945.mp3' 'https://www.myinstants.com/media/sounds/espera-eu-chegar_KHcHu4q.mp3' 'https://www.myinstants.com/pt/instant/vai-na-paz-irmao-91945/'
+          download 'faz-meu-pix-comprar-feijao-estevao-ferreira-11980.mp3' 'https://www.myinstants.com/media/sounds/faz-meu-pix-comprar-feijao-estevao-ferreira.mp3' 'https://www.myinstants.com/pt/instant/faz-meu-pix-comprar-feijao-estevao-ferreira-11980/'
+          download 'som-buzina-estourado-80490.mp3' 'https://www.myinstants.com/media/sounds/som-buzina-estourado.mp3' 'https://www.myinstants.com/pt/instant/som-buzina-estourado-80490/'
+          download 'smzinho-eu-e-voce-2721.mp3' 'https://www.myinstants.com/media/sounds/euevc.mp3' 'https://www.myinstants.com/pt/instant/smzinho-eu-e-voce-2721/'
+          download 'vou-resumir-em-duas-palavras-para-bens-15025.mp3' 'https://www.myinstants.com/media/sounds/vou-resumir-com-duas-palavras_160k.mp3' 'https://www.myinstants.com/pt/instant/vou-resumir-em-duas-palavras-para-bens-15025/'
+          download 'musica-do-chaves-25926.mp3' 'https://www.myinstants.com/media/sounds/musica-do-chaves.mp3' 'https://www.myinstants.com/pt/instant/musica-do-chaves-25926/'
+          download 'fala-comigo-bebe-12438.mp3' 'https://www.myinstants.com/media/sounds/yt1s-mp3cut_JALGaOJ.mp3' 'https://www.myinstants.com/pt/instant/fala-comigo-bebe-12438/'
+          download 'ai-que-nao-sei-oque-cala-boca-91787.mp3' 'https://www.myinstants.com/media/sounds/ai-que-nao-sei-oque-cala-boca.mp3' 'https://www.myinstants.com/pt/instant/ai-que-nao-sei-oque-cala-boca-91787/'
+          download 'soundpad-37229.mp3' 'https://www.myinstants.com/media/sounds/soundpad.mp3' 'https://www.myinstants.com/pt/instant/soundpad-37229/'
+          download 'ai-voce-ta-demonstrando-a-essencia-12632.mp3' 'https://www.myinstants.com/media/sounds/ai-voce-ta-demonstrando-a-essencia.mp3' 'https://www.myinstants.com/pt/instant/ai-voce-ta-demonstrando-a-essencia-12632/'
+          download 'eu-gosto-e-assim-amostradinho-87139.mp3' 'https://www.myinstants.com/media/sounds/eu-gosto-e-assim-amostradinho.mp3' 'https://www.myinstants.com/pt/instant/eu-gosto-e-assim-amostradinho-87139/'
+          download 'peguei-o-esquema-smzinho-38651.mp3' 'https://www.myinstants.com/media/sounds/peguei-o-esquema-smzinho.mp3' 'https://www.myinstants.com/pt/instant/peguei-o-esquema-smzinho-38651/'
+          download 'agora-deu-o-caraio-memo-20772.mp3' 'https://www.myinstants.com/media/sounds/agora-deu-o-caraio-memo.mp3' 'https://www.myinstants.com/pt/instant/agora-deu-o-caraio-memo-20772/'
+          download 'cativeiro-43348.mp3' 'https://www.myinstants.com/media/sounds/cativeiro.mp3' 'https://www.myinstants.com/pt/instant/cativeiro-43348/'
+          download 'bom-dia-pra-quem-quiser-61923.mp3' 'https://www.myinstants.com/media/sounds/bom-dia_BvImHGa.mp3' 'https://www.myinstants.com/pt/instant/bom-dia-pra-quem-quiser-61923/'
 
-            for (const source of sources) {
-              const u = new URL(source);
-              const parts = u.pathname.split('/').filter(Boolean);
-              const slug = parts[parts.length - 1];
-              const out = path.join('Sounds', `${slug}.mp3`);
-              const page = await context.newPage();
-
-              try {
-                console.log(`\n[OPEN] ${source}`);
-                await page.goto(source, { waitUntil: 'domcontentloaded', timeout: 60000 });
-
-                let href = null;
-                const candidates = page.locator('a[href*="/media/sounds/"]');
-                if (await candidates.count()) {
-                  href = await candidates.first().getAttribute('href');
-                }
-
-                if (!href) {
-                  const html = await page.content();
-                  const match = html.match(/(?:https?:\/\/www\.myinstants\.com)?\/media\/sounds\/[^"'<> ]+\.mp3(?:\?[^"'<> ]*)?/i);
-                  if (match) href = match[0];
-                }
-
-                if (!href) throw new Error('MP3 URL não encontrado na página');
-
-                const mediaUrl = new URL(href, source).href;
-                console.log(`[MP3] ${mediaUrl}`);
-
-                const response = await context.request.get(mediaUrl, {
-                  headers: {
-                    'Referer': source,
-                    'Accept': 'audio/mpeg,audio/*;q=0.9,*/*;q=0.8'
-                  },
-                  timeout: 60000
-                });
-
-                if (!response.ok()) {
-                  throw new Error(`HTTP ${response.status()} ao baixar MP3`);
-                }
-
-                const body = await response.body();
-                if (body.length < 100) throw new Error(`arquivo pequeno demais: ${body.length} bytes`);
-
-                fs.writeFileSync(out, body);
-                console.log(`[OK] ${out} (${body.length} bytes)`);
-              } catch (error) {
-                console.error(`[FAIL] ${source}: ${error.message}`);
-                failed.push(source);
-              } finally {
-                await page.close();
-              }
-            }
-
-            await browser.close();
-
-            console.log(`\nConcluído: ${sources.length - failed.length}/${sources.length}`);
-            if (failed.length) {
-              console.log('Falharam:');
-              for (const f of failed) console.log(`- ${f}`);
-            }
-          })().catch((error) => {
-            console.error(error);
-            process.exit(1);
-          });
-          NODE
+          echo "Baixados: $(find Sounds -type f -name '*.mp3' | wc -l)"
 
       - name: Commit downloaded sounds
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Sounds/*.mp3
+          git add Sounds
           if git diff --cached --quiet; then
             echo "Nenhum áudio foi baixado."
             exit 0
           fi
-          git commit -m "assets: adicionar sons do MyInstants"
+          git commit -m "assets: adicionar sons para Casterlabs"
           git push
