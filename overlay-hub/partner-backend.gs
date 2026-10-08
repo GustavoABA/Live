@@ -1,6 +1,8 @@
-var LATEST_KEY = "OVERLAY_HUB_LATEST_PARTNER";
-var SEEN_KEY = "OVERLAY_HUB_PARTNER_SEEN";
-var DEFAULT_COOLDOWN_MINUTES = 180;
+var LATEST_KEY = "OVERLAY_HUB_LATEST_EVENT";
+var PARTNER_SEEN_KEY = "OVERLAY_HUB_PARTNER_SEEN";
+var FOLLOW_SEEN_KEY = "OVERLAY_HUB_FOLLOW_SEEN";
+var DEFAULT_PARTNER_COOLDOWN_MINUTES = 180;
+var DEFAULT_FOLLOW_COOLDOWN_MINUTES = 10;
 
 function doGet(e) {
   var params = (e && e.parameter) ? e.parameter : {};
@@ -10,29 +12,42 @@ function doGet(e) {
     return registerPartner_(params);
   }
 
+  if (action === "follow") {
+    return registerFollow_(params);
+  }
+
   if (action === "latest") {
-    return getLatestPartner_(params);
+    return getLatestEvent_(params);
   }
 
   return output_(params.callback, {
     ok: true,
     service: "nihilguh-overlay-hub",
+    actions: ["partner", "follow", "latest"],
     now: Date.now()
   });
 }
 
-function registerPartner_(params) {
+function requireWriteToken_(params) {
   var properties = PropertiesService.getScriptProperties();
   var expectedToken = properties.getProperty("WRITE_TOKEN");
 
   if (!expectedToken) {
-    return output_(null, { ok: false, error: "WRITE_TOKEN_NOT_CONFIGURED" });
+    return { ok: false, error: "WRITE_TOKEN_NOT_CONFIGURED" };
   }
 
   if (String(params.token || "") !== expectedToken) {
-    return output_(null, { ok: false, error: "INVALID_TOKEN" });
+    return { ok: false, error: "INVALID_TOKEN" };
   }
 
+  return { ok: true, properties: properties };
+}
+
+function registerPartner_(params) {
+  var auth = requireWriteToken_(params);
+  if (!auth.ok) return output_(null, auth);
+
+  var properties = auth.properties;
   var nick = clean_(params.nick, 64);
   if (!nick) {
     return output_(null, { ok: false, error: "NICK_REQUIRED" });
@@ -45,26 +60,93 @@ function registerPartner_(params) {
   var cooldownMinutes = Number(properties.getProperty("PARTNER_COOLDOWN_MINUTES"));
 
   if (!isFinite(cooldownMinutes) || cooldownMinutes < 0) {
-    cooldownMinutes = DEFAULT_COOLDOWN_MINUTES;
+    cooldownMinutes = DEFAULT_PARTNER_COOLDOWN_MINUTES;
   }
 
-  var cooldownMs = cooldownMinutes * 60 * 1000;
-  var key = (platform + ":" + nick).toLowerCase();
+  var result = registerWithCooldown_({
+    properties: properties,
+    seenKey: PARTNER_SEEN_KEY,
+    cooldownMs: cooldownMinutes * 60 * 1000,
+    dedupeKey: (platform + ":" + nick).toLowerCase(),
+    event: {
+      id: "partner-" + now + "-" + Utilities.getUuid().slice(0, 8),
+      type: "partner",
+      nick: nick,
+      name: name,
+      platform: platform.toUpperCase(),
+      avatar: avatar,
+      timestamp: now
+    }
+  });
+
+  return output_(null, result);
+}
+
+function registerFollow_(params) {
+  var auth = requireWriteToken_(params);
+  if (!auth.ok) return output_(null, auth);
+
+  var properties = auth.properties;
+  var nick = clean_(params.nick, 64);
+  if (!nick) {
+    return output_(null, { ok: false, error: "NICK_REQUIRED" });
+  }
+
+  var name = clean_(params.name, 80) || nick;
+  var platform = (clean_(params.platform, 32) || "TIKTOK").toUpperCase();
+  var avatar = clean_(params.avatar, 1000);
+  var sourceId = clean_(params.sourceId, 180);
+  var now = Date.now();
+  var cooldownMinutes = Number(properties.getProperty("FOLLOW_COOLDOWN_MINUTES"));
+
+  if (!isFinite(cooldownMinutes) || cooldownMinutes < 0) {
+    cooldownMinutes = DEFAULT_FOLLOW_COOLDOWN_MINUTES;
+  }
+
+  // Se o Casterlabs fornecer um identificador estavel, ele e preferido para
+  // deduplicacao. Caso contrario, usuario + plataforma evita alertas repetidos
+  // durante reconexoes do TikTok.
+  var dedupeKey = sourceId ? (platform + ":" + sourceId) : (platform + ":" + nick);
+
+  var result = registerWithCooldown_({
+    properties: properties,
+    seenKey: FOLLOW_SEEN_KEY,
+    cooldownMs: cooldownMinutes * 60 * 1000,
+    dedupeKey: dedupeKey.toLowerCase(),
+    event: {
+      id: "follow-" + now + "-" + Utilities.getUuid().slice(0, 8),
+      type: "follow",
+      nick: nick,
+      name: name,
+      platform: platform,
+      avatar: avatar,
+      sourceId: sourceId,
+      timestamp: now
+    }
+  });
+
+  return output_(null, result);
+}
+
+function registerWithCooldown_(options) {
+  var properties = options.properties;
+  var cooldownMs = Math.max(0, Number(options.cooldownMs) || 0);
+  var now = Date.now();
   var lock = LockService.getScriptLock();
 
   try {
     lock.waitLock(3000);
 
-    var seen = parseJson_(properties.getProperty(SEEN_KEY), {});
-    var lastSeen = Number(seen[key] || 0);
+    var seen = parseJson_(properties.getProperty(options.seenKey), {});
+    var lastSeen = Number(seen[options.dedupeKey] || 0);
 
     if (cooldownMs > 0 && lastSeen && (now - lastSeen) < cooldownMs) {
-      return output_(null, {
+      return {
         ok: true,
         duplicate: true,
-        nick: nick,
+        nick: options.event.nick,
         retryAfterMs: cooldownMs - (now - lastSeen)
-      });
+      };
     }
 
     Object.keys(seen).forEach(function (seenKey) {
@@ -73,29 +155,25 @@ function registerPartner_(params) {
       }
     });
 
-    seen[key] = now;
+    seen[options.dedupeKey] = now;
+    properties.setProperty(options.seenKey, JSON.stringify(seen));
+    properties.setProperty(LATEST_KEY, JSON.stringify(options.event));
 
-    var event = {
-      id: now + "-" + Utilities.getUuid().slice(0, 8),
-      nick: nick,
-      name: name,
-      platform: platform.toUpperCase(),
-      avatar: avatar,
-      timestamp: now
-    };
-
-    properties.setProperty(SEEN_KEY, JSON.stringify(seen));
-    properties.setProperty(LATEST_KEY, JSON.stringify(event));
-
-    return output_(null, { ok: true, duplicate: false, event: event });
+    return { ok: true, duplicate: false, event: options.event };
   } finally {
     if (lock.hasLock()) lock.releaseLock();
   }
 }
 
-function getLatestPartner_(params) {
+function getLatestEvent_(params) {
   var properties = PropertiesService.getScriptProperties();
   var event = parseJson_(properties.getProperty(LATEST_KEY), null);
+
+  // Compatibilidade com implantacoes antigas, antes de LATEST_KEY virar generico.
+  if (!event) {
+    event = parseJson_(properties.getProperty("OVERLAY_HUB_LATEST_PARTNER"), null);
+    if (event && !event.type) event.type = "partner";
+  }
 
   return output_(params.callback, {
     ok: true,
