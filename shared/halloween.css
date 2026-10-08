@@ -1,0 +1,30 @@
+@import url('./scene.css');
+
+:root { --halloween-orange:#ff762c; --halloween-ember:#ffbd58; --halloween-wine:#2b0714; }
+body.halloween { --accent:#f0783f; --gold:#ffbd58; --muted:#d3a6a4; --line:rgba(255,126,53,.55); --glass:rgba(18,3,10,.64); }
+body.halloween .scene { background:#090307; }
+body.halloween .backdrop { filter:saturate(.54) hue-rotate(292deg) contrast(1.16); }
+body.halloween .backdrop::before { background:radial-gradient(circle at var(--glow-x,70%) var(--glow-y,28%),rgba(235,67,29,.32),transparent 34%),linear-gradient(115deg,rgba(6,1,6,.83),rgba(35,5,13,.31) 52%,rgba(7,1,6,.8)); }
+body.halloween .scene::before { opacity:.7; background:radial-gradient(ellipse at 24% 55%,rgba(192,32,28,.25),transparent 35%),radial-gradient(ellipse at 74% 48%,rgba(255,114,38,.17),transparent 34%); }
+body.halloween .ornament-border { border-color:rgba(255,136,57,.38); }
+body.halloween .ornament-border::before,body.halloween .ornament-border::after { content:'☾'; color:var(--halloween-ember); }
+body.halloween .brand span,body.halloween .scene-index span { color:#d49a8d; }
+body.halloween .brand::after { background:linear-gradient(90deg,var(--halloween-orange),transparent); }
+body.halloween .panel,body.halloween .slot { border-color:rgba(245,106,51,.66); background:linear-gradient(145deg,rgba(40,5,14,.46),rgba(8,2,8,.22)); box-shadow:inset 0 0 0 3px rgba(255,160,91,.025),0 22px 60px rgba(0,0,0,.34); }
+body.halloween .panel::before,body.halloween .panel::after,body.halloween .slot::before,body.halloween .slot::after { border-color:var(--halloween-ember); }
+body.halloween .panel-label,body.halloween .slot-number { color:#ffba72; }
+body.halloween .guide { border-color:rgba(255,123,61,.42); background:rgba(17,2,9,.9); }
+body.halloween .deco-strip,body.halloween .tea-note { color:rgba(255,167,106,.78); }
+body.halloween .gameplay-mark { color:rgba(255,182,113,.48); }
+body.halloween .emergency-card { border-color:rgba(255,92,46,.8); background:rgba(24,2,9,.74); box-shadow:0 0 80px rgba(211,48,26,.18),inset 0 0 80px rgba(211,48,26,.08); }
+body.halloween .emergency-card::before { border-color:rgba(255,145,76,.25); }
+body.halloween .emergency-card .icon { color:#ff7d42; }
+body.halloween .character { filter:sepia(.3) hue-rotate(302deg) saturate(.98) drop-shadow(0 24px 36px rgba(0,0,0,.68)); }
+.halloween-decor { position:absolute; inset:0; z-index:2; overflow:hidden; pointer-events:none; }
+.halloween-decor::before { content:''; position:absolute; left:-20vw; bottom:-12vh; width:145vw; height:30vh; border-radius:50%; opacity:.54; filter:blur(25px); background:radial-gradient(ellipse,rgba(147,93,107,.34),rgba(67,24,48,.08) 50%,transparent 70%); animation:halloween-mist 19s ease-in-out infinite alternate; }
+.halloween-decor::after { content:''; position:absolute; right:0; top:0; width:19vw; min-width:180px; aspect-ratio:1; opacity:.43; background:repeating-radial-gradient(ellipse at 100% 0,transparent 0 12%,rgba(246,217,204,.56) 12.4% 12.8%,transparent 13.2% 20%),repeating-conic-gradient(from 0deg at 100% 0,transparent 0deg 21deg,rgba(246,217,204,.55) 21.3deg 21.8deg,transparent 22deg 45deg); mask-image:radial-gradient(circle at 100% 0,#000 0 82%,transparent 83%); }
+.halloween-decor i { position:absolute; width:29px; height:13px; background:#08040a; clip-path:polygon(0 55%,20% 10%,48% 52%,50% 15%,54% 52%,80% 10%,100% 55%,76% 48%,62% 100%,50% 65%,38% 100%,24% 48%); filter:drop-shadow(0 0 3px #000); animation:halloween-bat 10s linear infinite; }
+.halloween-decor i:nth-child(1){top:17%;left:39%;animation-delay:-2s}.halloween-decor i:nth-child(2){top:29%;left:49%;transform:scale(.58);animation-delay:-6s}.halloween-decor i:nth-child(3){top:13%;left:57%;transform:scale(.76);animation-delay:-8s}.halloween-decor i:nth-child(4){top:25%;left:68%;transform:scale(.49);animation-delay:-4s}
+@keyframes halloween-mist { to { transform:translate3d(18vw,-2vh,0); } }
+@keyframes halloween-bat { 0%{translate:-6vw 0;rotate:-4deg}45%{translate:7vw -2vh;rotate:5deg}100%{translate:22vw 1vh;rotate:-5deg} }
+@media (prefers-reduced-motion:reduce){.halloween-decor::before,.halloween-decor i{animation:none!important}}
