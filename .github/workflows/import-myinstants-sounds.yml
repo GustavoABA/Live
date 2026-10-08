@@ -1,15 +1,15 @@
 name: Import MyInstants Sounds
 
 on:
-  push:
-    paths:
-      - '.github/workflows/import-myinstants-sounds.yml'
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 jobs:
   import-sounds:
+    if: github.event.issue.title == 'IMPORT_MYINSTANTS_SOUNDS'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
