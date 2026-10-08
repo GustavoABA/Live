@@ -7,6 +7,9 @@
   var partnerCard = document.getElementById("partner-card");
   var partnerName = document.getElementById("partner-name");
   var partnerMeta = document.getElementById("partner-meta");
+  var partnerKicker = document.getElementById("partner-kicker");
+  var partnerStampTop = document.getElementById("partner-stamp-top");
+  var partnerStampBottom = document.getElementById("partner-stamp-bottom");
   var partnerAvatar = document.getElementById("partner-avatar");
   var statusEl = document.getElementById("hub-status");
 
@@ -22,14 +25,16 @@
     .map(function (value) { return value.trim().toLowerCase(); })
     .filter(Boolean);
 
-  var partnerCfg = cfg.partner || {};
-  var endpoint = params.get("endpoint") || partnerCfg.endpoint || "";
-  var pollMs = Math.max(600, Number(partnerCfg.pollMs) || 1000);
-  var visibleMs = Math.max(1500, Number(partnerCfg.visibleMs) || 6000);
-  var dedupeMs = Math.max(0, Number(partnerCfg.dedupeMs) || 0);
+  // "events" e o nome atual. "partner" fica como fallback para configs antigas.
+  var eventCfg = cfg.events || cfg.partner || {};
+  var endpoint = params.get("endpoint") || eventCfg.endpoint || "";
+  var pollMs = Math.max(600, Number(eventCfg.pollMs) || 1000);
+  var visibleMs = Math.max(1500, Number(eventCfg.visibleMs) || 6000);
+  var dedupeMs = Math.max(0, Number(eventCfg.dedupeMs) || 0);
+  var maxAgeMs = Math.max(15000, Number(eventCfg.maxAgeMs) || 120000);
 
   var lastEventId = null;
-  var recentPartners = Object.create(null);
+  var recentEvents = Object.create(null);
   var queue = [];
   var isAnimating = false;
   var pollTimer = null;
@@ -63,8 +68,6 @@
     overlays.forEach(function (item, index) {
       if (!item || item.enabled === false || !item.url || !shouldMount(item)) return;
 
-      // Cada alertbox e carregado como documento HTML embutido por <object>,
-      // ocupando o mesmo canvas e empilhado por z-index.
       var object = document.createElement("object");
       object.className = "external-overlay";
       object.dataset.overlayId = item.id || String(index);
@@ -75,9 +78,6 @@
       object.style.background = "transparent";
       object.style.backgroundColor = "rgba(0,0,0,0)";
 
-      // Alguns provedores (ex.: LivePix) pintam o documento embutido de branco.
-      // Nao podemos alterar o CSS interno por ser cross-origin, entao removemos
-      // apenas pixels quase brancos no resultado final do <object>.
       if (whiteKeyEnabled && item.whiteKey === true) {
         object.style.filter = "url(#white-key)";
         object.style.webkitFilter = "url(#white-key)";
@@ -99,37 +99,48 @@
     debug("Alertboxes carregados: " + mounted);
   }
 
-  function normalizePartner(payload) {
+  function normalizeEvent(payload) {
     if (!payload || typeof payload !== "object") return null;
+
     var nick = String(payload.nick || payload.username || "").trim();
     if (!nick) return null;
 
+    var type = String(payload.type || "partner").trim().toLowerCase();
+    if (type !== "follow" && type !== "partner") type = "partner";
+
     return {
-      id: String(payload.id || (Date.now() + ":" + nick)),
+      id: String(payload.id || (Date.now() + ":" + type + ":" + nick)),
+      type: type,
       nick: nick,
       name: String(payload.name || payload.displayname || nick).trim(),
-      platform: String(payload.platform || "COMUNIDADE").trim().toUpperCase(),
+      platform: String(payload.platform || (type === "follow" ? "TIKTOK" : "COMUNIDADE")).trim().toUpperCase(),
       avatar: String(payload.avatar || "").trim(),
       timestamp: Number(payload.timestamp) || Date.now()
     };
   }
 
-  function partnerKey(partner) {
-    return (partner.platform + ":" + partner.nick).toLowerCase();
+  function eventKey(item) {
+    return (item.type + ":" + item.platform + ":" + item.nick).toLowerCase();
   }
 
-  function enqueuePartner(payload) {
-    var partner = normalizePartner(payload);
-    if (!partner || partner.id === lastEventId) return;
-    lastEventId = partner.id;
+  function enqueueEvent(payload, allowOld) {
+    var item = normalizeEvent(payload);
+    if (!item || item.id === lastEventId) return;
 
-    var key = partnerKey(partner);
     var now = Date.now();
-    var lastSeen = recentPartners[key] || 0;
+    if (!allowOld && item.timestamp && (now - item.timestamp) > maxAgeMs) {
+      lastEventId = item.id;
+      return;
+    }
+
+    lastEventId = item.id;
+
+    var key = eventKey(item);
+    var lastSeen = recentEvents[key] || 0;
     if (dedupeMs && (now - lastSeen) < dedupeMs) return;
 
-    recentPartners[key] = now;
-    queue.push(partner);
+    recentEvents[key] = now;
+    queue.push(item);
     drainQueue();
   }
 
@@ -149,16 +160,34 @@
     partnerAvatar.src = url;
   }
 
-  function showPartner(partner) {
+  function applyCopy(item) {
+    if (!partnerCard) return;
+
+    partnerCard.dataset.eventType = item.type;
+    partnerName.textContent = item.name.charAt(0) === "@" ? item.name : ("@" + item.name);
+
+    if (item.type === "follow") {
+      partnerKicker.textContent = "NOVO FOLLOW NO TIKTOK";
+      partnerMeta.textContent = "BEM-VINDO AO WONDERLAND · OBRIGADO POR SEGUIR";
+      partnerStampTop.textContent = "TIKTOK";
+      partnerStampBottom.textContent = "FOLLOW";
+    } else {
+      partnerKicker.textContent = "PARCEIRO DE LIVE NO CHAT";
+      partnerMeta.textContent = item.platform + " · COMUNIDADE NIHILGUH";
+      partnerStampTop.textContent = "LIVE";
+      partnerStampBottom.textContent = "PARTNER";
+    }
+  }
+
+  function showEvent(item) {
     return new Promise(function (resolve) {
-      if (!partnerCard || !partnerLayer || !partnerName || !partnerMeta) {
+      if (!partnerCard || !partnerLayer || !partnerName || !partnerMeta || !partnerKicker) {
         resolve();
         return;
       }
 
-      partnerName.textContent = partner.name.charAt(0) === "@" ? partner.name : ("@" + partner.name);
-      partnerMeta.textContent = partner.platform + " · COMUNIDADE NIHILGUH";
-      setAvatar(partner.avatar);
+      applyCopy(item);
+      setAvatar(item.avatar);
 
       partnerCard.classList.remove("is-entering", "is-visible", "is-leaving");
       partnerLayer.classList.remove("is-active");
@@ -190,14 +219,14 @@
     if (isAnimating || queue.length === 0) return;
     isAnimating = true;
     var next = queue.shift();
-    showPartner(next).then(function () {
+    showEvent(next).then(function () {
       isAnimating = false;
       drainQueue();
     });
   }
 
   function jsonp(url, onSuccess, onError) {
-    var callbackName = "__nihilPartner_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+    var callbackName = "__nihilOverlay_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
     var script = document.createElement("script");
     var finished = false;
 
@@ -235,7 +264,7 @@
     jsonp(
       endpoint,
       function (data) {
-        if (data && data.ok && data.event) enqueuePartner(data.event);
+        if (data && data.ok && data.event) enqueueEvent(data.event, false);
         pollTimer = window.setTimeout(poll, pollMs);
       },
       function () {
@@ -245,16 +274,20 @@
   }
 
   function runQueryTest() {
-    var testNick = params.get("partner") || params.get("testPartner");
-    if (!testNick) return;
-    enqueuePartner({
+    var followNick = params.get("follow") || params.get("testFollow");
+    var partnerNick = params.get("partner") || params.get("testPartner");
+    var nick = followNick || partnerNick;
+    if (!nick) return;
+
+    enqueueEvent({
       id: "query-test-" + Date.now(),
-      nick: testNick,
-      name: params.get("name") || testNick,
-      platform: params.get("platform") || "TWITCH",
+      type: followNick ? "follow" : "partner",
+      nick: nick,
+      name: params.get("name") || nick,
+      platform: params.get("platform") || (followNick ? "TIKTOK" : "TWITCH"),
       avatar: params.get("avatar") || "",
       timestamp: Date.now()
-    });
+    }, true);
   }
 
   function init() {
