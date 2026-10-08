@@ -33,112 +33,117 @@ jobs:
           const path = require('path');
           const { chromium } = require('playwright');
 
-          const sources = [
-            'https://www.myinstants.com/pt/instant/fahhh-42300/',
-            'https://www.myinstants.com/pt/instant/voce-nao-tem-aura-559/',
-            'https://www.myinstants.com/pt/instant/maldito-traidor-17987/',
-            'https://www.myinstants.com/pt/instant/cala-boca-e-escuta-o-som-do-meu-corsa-11632/',
-            'https://www.myinstants.com/pt/instant/aiiii-aiii-aiiii-12809/',
-            'https://www.myinstants.com/pt/instant/brutal-acabou-pro-beta-globo-88904/',
-            'https://www.myinstants.com/pt/instant/papo-de-undaia-82584/',
-            'https://www.myinstants.com/pt/instant/o-nome-dele-e-bob-65961/',
-            'https://www.myinstants.com/pt/instant/o-casal-mais-lindo-do-brasil-65726/',
-            'https://www.myinstants.com/pt/instant/ze-da-manga-97909/',
-            'https://www.myinstants.com/pt/instant/peteco-peteco-2343/',
-            'https://www.myinstants.com/pt/instant/bruh/',
-            'https://www.myinstants.com/pt/instant/seu-madruga-nossa-lento-47-50113/',
-            'https://www.myinstants.com/pt/instant/vai-novinha-lula-e-bolsonaro-57201/',
-            'https://www.myinstants.com/pt/instant/toma-milk-shake-de-morango-59364/',
-            'https://www.myinstants.com/pt/instant/cade-meu-pix-89377/',
-            'https://www.myinstants.com/pt/instant/papoi-65557/',
-            'https://www.myinstants.com/pt/instant/vai-na-paz-irmao-91945/',
-            'https://www.myinstants.com/pt/instant/faz-meu-pix-comprar-feijao-estevao-ferreira-11980/',
-            'https://www.myinstants.com/pt/instant/som-buzina-estourado-80490/',
-            'https://www.myinstants.com/pt/instant/smzinho-eu-e-voce-2721/',
-            'https://www.myinstants.com/pt/instant/vou-resumir-em-duas-palavras-para-bens-15025/',
-            'https://www.myinstants.com/pt/instant/musica-do-chaves-25926/',
-            'https://www.myinstants.com/pt/instant/fala-comigo-bebe-12438/',
-            'https://www.myinstants.com/pt/instant/ai-que-nao-sei-oque-cala-boca-91787/',
-            'https://www.myinstants.com/pt/instant/soundpad-37229/',
-            'https://www.myinstants.com/pt/instant/ai-voce-ta-demonstrando-a-essencia-12632/',
-            'https://www.myinstants.com/pt/instant/maldito-traidor-70615/',
-            'https://www.myinstants.com/pt/instant/eu-gosto-e-assim-amostradinho-87139/',
-            'https://www.myinstants.com/pt/instant/peguei-o-esquema-smzinho-38651/',
-            'https://www.myinstants.com/pt/instant/agora-deu-o-caraio-memo-20772/',
-            'https://www.myinstants.com/pt/instant/cativeiro-43348/',
-            'https://www.myinstants.com/pt/instant/bom-dia-pra-quem-quiser-61923/'
-          ];
+          (async () => {
+            const sources = [
+              'https://www.myinstants.com/pt/instant/fahhh-42300/',
+              'https://www.myinstants.com/pt/instant/voce-nao-tem-aura-559/',
+              'https://www.myinstants.com/pt/instant/maldito-traidor-17987/',
+              'https://www.myinstants.com/pt/instant/cala-boca-e-escuta-o-som-do-meu-corsa-11632/',
+              'https://www.myinstants.com/pt/instant/aiiii-aiii-aiiii-12809/',
+              'https://www.myinstants.com/pt/instant/brutal-acabou-pro-beta-globo-88904/',
+              'https://www.myinstants.com/pt/instant/papo-de-undaia-82584/',
+              'https://www.myinstants.com/pt/instant/o-nome-dele-e-bob-65961/',
+              'https://www.myinstants.com/pt/instant/o-casal-mais-lindo-do-brasil-65726/',
+              'https://www.myinstants.com/pt/instant/ze-da-manga-97909/',
+              'https://www.myinstants.com/pt/instant/peteco-peteco-2343/',
+              'https://www.myinstants.com/pt/instant/bruh/',
+              'https://www.myinstants.com/pt/instant/seu-madruga-nossa-lento-47-50113/',
+              'https://www.myinstants.com/pt/instant/vai-novinha-lula-e-bolsonaro-57201/',
+              'https://www.myinstants.com/pt/instant/toma-milk-shake-de-morango-59364/',
+              'https://www.myinstants.com/pt/instant/cade-meu-pix-89377/',
+              'https://www.myinstants.com/pt/instant/papoi-65557/',
+              'https://www.myinstants.com/pt/instant/vai-na-paz-irmao-91945/',
+              'https://www.myinstants.com/pt/instant/faz-meu-pix-comprar-feijao-estevao-ferreira-11980/',
+              'https://www.myinstants.com/pt/instant/som-buzina-estourado-80490/',
+              'https://www.myinstants.com/pt/instant/smzinho-eu-e-voce-2721/',
+              'https://www.myinstants.com/pt/instant/vou-resumir-em-duas-palavras-para-bens-15025/',
+              'https://www.myinstants.com/pt/instant/musica-do-chaves-25926/',
+              'https://www.myinstants.com/pt/instant/fala-comigo-bebe-12438/',
+              'https://www.myinstants.com/pt/instant/ai-que-nao-sei-oque-cala-boca-91787/',
+              'https://www.myinstants.com/pt/instant/soundpad-37229/',
+              'https://www.myinstants.com/pt/instant/ai-voce-ta-demonstrando-a-essencia-12632/',
+              'https://www.myinstants.com/pt/instant/maldito-traidor-70615/',
+              'https://www.myinstants.com/pt/instant/eu-gosto-e-assim-amostradinho-87139/',
+              'https://www.myinstants.com/pt/instant/peguei-o-esquema-smzinho-38651/',
+              'https://www.myinstants.com/pt/instant/agora-deu-o-caraio-memo-20772/',
+              'https://www.myinstants.com/pt/instant/cativeiro-43348/',
+              'https://www.myinstants.com/pt/instant/bom-dia-pra-quem-quiser-61923/'
+            ];
 
-          fs.mkdirSync('Sounds', { recursive: true });
+            fs.mkdirSync('Sounds', { recursive: true });
 
-          const browser = await chromium.launch({ headless: true });
-          const context = await browser.newContext({
-            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
-            locale: 'pt-BR'
-          });
+            const browser = await chromium.launch({ headless: true });
+            const context = await browser.newContext({
+              userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
+              locale: 'pt-BR'
+            });
 
-          const failed = [];
+            const failed = [];
 
-          for (const source of sources) {
-            const u = new URL(source);
-            const parts = u.pathname.split('/').filter(Boolean);
-            const slug = parts[parts.length - 1];
-            const out = path.join('Sounds', `${slug}.mp3`);
-            const page = await context.newPage();
+            for (const source of sources) {
+              const u = new URL(source);
+              const parts = u.pathname.split('/').filter(Boolean);
+              const slug = parts[parts.length - 1];
+              const out = path.join('Sounds', `${slug}.mp3`);
+              const page = await context.newPage();
 
-            try {
-              console.log(`\n[OPEN] ${source}`);
-              await page.goto(source, { waitUntil: 'domcontentloaded', timeout: 60000 });
+              try {
+                console.log(`\n[OPEN] ${source}`);
+                await page.goto(source, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
-              let href = null;
-              const candidates = page.locator('a[href*="/media/sounds/"]');
-              if (await candidates.count()) {
-                href = await candidates.first().getAttribute('href');
+                let href = null;
+                const candidates = page.locator('a[href*="/media/sounds/"]');
+                if (await candidates.count()) {
+                  href = await candidates.first().getAttribute('href');
+                }
+
+                if (!href) {
+                  const html = await page.content();
+                  const match = html.match(/(?:https?:\/\/www\.myinstants\.com)?\/media\/sounds\/[^"'<> ]+\.mp3(?:\?[^"'<> ]*)?/i);
+                  if (match) href = match[0];
+                }
+
+                if (!href) throw new Error('MP3 URL não encontrado na página');
+
+                const mediaUrl = new URL(href, source).href;
+                console.log(`[MP3] ${mediaUrl}`);
+
+                const response = await context.request.get(mediaUrl, {
+                  headers: {
+                    'Referer': source,
+                    'Accept': 'audio/mpeg,audio/*;q=0.9,*/*;q=0.8'
+                  },
+                  timeout: 60000
+                });
+
+                if (!response.ok()) {
+                  throw new Error(`HTTP ${response.status()} ao baixar MP3`);
+                }
+
+                const body = await response.body();
+                if (body.length < 100) throw new Error(`arquivo pequeno demais: ${body.length} bytes`);
+
+                fs.writeFileSync(out, body);
+                console.log(`[OK] ${out} (${body.length} bytes)`);
+              } catch (error) {
+                console.error(`[FAIL] ${source}: ${error.message}`);
+                failed.push(source);
+              } finally {
+                await page.close();
               }
-
-              if (!href) {
-                const html = await page.content();
-                const match = html.match(/(?:https?:\/\/www\.myinstants\.com)?\/media\/sounds\/[^"'<> ]+\.mp3(?:\?[^"'<> ]*)?/i);
-                if (match) href = match[0];
-              }
-
-              if (!href) throw new Error('MP3 URL não encontrado na página');
-
-              const mediaUrl = new URL(href, source).href;
-              console.log(`[MP3] ${mediaUrl}`);
-
-              const response = await context.request.get(mediaUrl, {
-                headers: {
-                  'Referer': source,
-                  'Accept': 'audio/mpeg,audio/*;q=0.9,*/*;q=0.8'
-                },
-                timeout: 60000
-              });
-
-              if (!response.ok()) {
-                throw new Error(`HTTP ${response.status()} ao baixar MP3`);
-              }
-
-              const body = await response.body();
-              if (body.length < 100) throw new Error(`arquivo pequeno demais: ${body.length} bytes`);
-
-              fs.writeFileSync(out, body);
-              console.log(`[OK] ${out} (${body.length} bytes)`);
-            } catch (error) {
-              console.error(`[FAIL] ${source}: ${error.message}`);
-              failed.push(source);
-            } finally {
-              await page.close();
             }
-          }
 
-          await browser.close();
+            await browser.close();
 
-          console.log(`\nConcluído: ${sources.length - failed.length}/${sources.length}`);
-          if (failed.length) {
-            console.log('Falharam:');
-            for (const f of failed) console.log(`- ${f}`);
-          }
+            console.log(`\nConcluído: ${sources.length - failed.length}/${sources.length}`);
+            if (failed.length) {
+              console.log('Falharam:');
+              for (const f of failed) console.log(`- ${f}`);
+            }
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
           NODE
 
       - name: Commit downloaded sounds
