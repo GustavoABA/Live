@@ -1,227 +1,201 @@
-/* Estilos exclusivos da cena 00. As demais cenas continuam usando shared/scene.css. */
+/* Cena 00: galeria limpa, uma fanart por vez, sem moldura nem tarjas pretas. */
 .scene[data-scene="0"] .hero-right {
-  left: 5vw;
+  left: 4vw;
   right: auto;
-  top: 41%;
+  top: 46%;
   width: 35vw;
-  max-width: 660px;
-  padding: clamp(20px, 2.3vw, 44px);
-  transform: translateY(-42%);
+  max-width: 650px;
+  transform: translateY(-45%);
+  padding: clamp(18px, 2vw, 36px);
   border: 0;
-  border-left: 1px solid rgba(230, 198, 144, .62);
-  background: linear-gradient(100deg, rgba(8, 5, 13, .6), rgba(8, 5, 13, .18));
-  text-align: left;
+  border-left: 1px solid rgba(230, 198, 144, .5);
+  background: linear-gradient(90deg, rgba(8, 5, 13, .5), rgba(8, 5, 13, .06));
   box-shadow: none;
+  text-align: left;
 }
 .scene[data-scene="0"] .hero-right .rule { justify-content: flex-start; }
 .scene[data-scene="0"] .hero-right .title {
-  font-size: clamp(56px, 6.1vw, 118px);
-  line-height: .81;
+  font-size: clamp(52px, 5.7vw, 112px);
+  line-height: .82;
 }
 .scene[data-scene="0"] .character {
-  left: -5vw;
-  bottom: -34vh;
+  left: -6vw;
+  bottom: -33vh;
   width: min(46vw, 850px);
-  opacity: .78;
+  opacity: .74;
 }
-.scene[data-scene="0"] .countdown { margin-top: 20px; }
+.scene[data-scene="0"] .countdown { margin-top: 16px; }
 
+/* Toda a área útil é destinada a uma única imagem, sem fundo de preenchimento. */
 .fanarts {
   position: absolute;
   z-index: 9;
-  right: 5vw;
-  top: 17vh;
-  bottom: 12vh;
-  width: 50vw;
+  right: 2.5vw;
+  top: 13vh;
+  bottom: 7vh;
+  width: 58vw;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  padding: clamp(18px, 2.2vw, 42px);
-  border: 1px solid rgba(224, 195, 243, .48);
-  background:
-    radial-gradient(circle at 84% 4%, rgba(195, 141, 228, .16), transparent 42%),
-    linear-gradient(145deg, rgba(21, 11, 32, .9), rgba(7, 5, 13, .85));
-  box-shadow: 0 20px 80px rgba(0, 0, 0, .52), inset 0 0 0 6px rgba(208, 167, 234, .025);
-  backdrop-filter: blur(18px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
-.fanarts::before, .fanarts::after {
-  position: absolute;
-  content: '✧';
-  color: var(--gold);
-  font: 25px var(--serif);
-  pointer-events: none;
-}
-.fanarts::before { left: -8px; top: -16px; }
-.fanarts::after { right: -8px; bottom: -16px; }
-
 .fanarts-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 16px;
-  padding-bottom: clamp(14px, 1.8vh, 25px);
-  border-bottom: 1px solid rgba(230, 198, 144, .27);
-}
-.fanarts-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 11px;
-  border: 1px solid rgba(230, 198, 144, .6);
-  background: rgba(223, 182, 201, .12);
-  color: #ffdeec;
-  font: 600 clamp(9px, .75vw, 12px)/1 var(--sans);
-  letter-spacing: .2em;
-}
-.fanarts-tab > span { color: var(--gold); }
-.fanarts-heading h2 {
-  margin: 13px 0 3px;
-  font: 500 clamp(27px, 2.8vw, 50px)/.95 var(--serif);
-  color: #fff7ff;
-}
-.fanarts-heading h2 span { color: var(--rose); }
-.fanarts-heading p {
-  margin: 9px 0 0;
-  color: var(--muted);
-  font-size: clamp(8px, .65vw, 12px);
-  letter-spacing: .09em;
-}
-.fanarts-progress {
   flex: none;
-  color: var(--gold);
-  font: 500 clamp(13px, 1.2vw, 20px)/1 var(--serif);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .08em;
-  white-space: nowrap;
+  padding: 0 0 clamp(12px, 1.8vh, 24px);
+  margin: 0;
+  text-align: center;
+}
+.fanarts-heading h2 {
+  margin: 0;
+  color: #fff7ff;
+  font: 500 clamp(35px, 3.4vw, 66px)/1.04 var(--serif);
+  text-shadow: 0 3px 24px rgba(5, 2, 10, .9);
 }
 
 .fanarts-window {
   position: relative;
-  flex: 1;
+  width: 100%;
   min-height: 0;
+  flex: 1 1 auto;
   overflow: hidden;
-  margin-top: clamp(14px, 1.7vh, 28px);
-  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 88%, transparent 100%);
-  mask-image: linear-gradient(90deg, #000 0%, #000 88%, transparent 100%);
+  background: transparent;
+  touch-action: pan-y;
 }
 .fanarts-track {
-  height: 100%;
   display: flex;
   align-items: stretch;
-  gap: clamp(12px, 1.4vw, 24px);
+  width: 100%;
+  height: 100%;
+  gap: 0;
   transform: translate3d(0, 0, 0);
-  transition: transform 900ms cubic-bezier(.25, .8, .2, 1);
+  transition: transform 850ms cubic-bezier(.22, .72, .22, 1);
   will-change: transform;
 }
-.fanarts-track.is-single { justify-content: center; }
 .fanart-card {
-  flex: 0 0 69%;
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
   min-width: 0;
   min-height: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  padding: clamp(10px, 1vw, 18px);
-  border: 1px solid rgba(235, 209, 248, .32);
-  background: rgba(36, 23, 47, .66);
-  box-shadow: 0 14px 35px rgba(0, 0, 0, .25);
-}
-.fanarts-track.is-single .fanart-card { flex-basis: min(76%, 420px); }
-.fanart-art {
-  min-height: 0;
-  flex: 1;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  background: rgba(5, 4, 9, .72);
 }
-.fanart-art img {
+.fanart-card img {
   display: block;
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
+  object-position: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
-.fanart-card figcaption {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 9px;
-  padding: clamp(8px, 1.1vh, 18px) 2px 0;
-  color: var(--ink);
-}
-.fanart-card figcaption small {
-  color: var(--muted);
-  font: 500 clamp(8px, .6vw, 11px)/1.4 var(--sans);
-  letter-spacing: .06em;
-}
-.fanart-card figcaption strong {
-  color: #f4d5e8;
-  font: italic 600 clamp(20px, 1.7vw, 32px)/1 var(--serif);
-  overflow-wrap: anywhere;
-}
-.fanarts-bottom {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  min-height: 25px;
-  margin-top: clamp(10px, 1.5vh, 20px);
-  color: var(--muted);
-  font: 500 clamp(7px, .5vw, 10px)/1.3 var(--sans);
-  letter-spacing: .07em;
-}
-.fanarts-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(230,198,144,.42), transparent); }
-.fanarts-bottom span:last-child { color: var(--rose); text-align: right; }
-
 .motion-off .fanarts-track { transition: none !important; }
 
+/* 9:16 do OBS e celulares: mensagem no alto, fanart em destaque abaixo. */
 @media (orientation: portrait) {
   .scene[data-scene="0"] .hero-right {
-    left: 6vw;
+    left: 5vw;
     right: auto;
-    top: 11vh;
-    width: 88vw;
+    top: 10vh;
+    width: 90vw;
     max-width: none;
-    padding: 24px 20px 18px;
+    padding: clamp(15px, 2.2vw, 28px);
     transform: none;
     border-left: 0;
-    border-top: 1px solid rgba(230, 198, 144, .62);
+    border-top: 1px solid rgba(230, 198, 144, .5);
     text-align: center;
   }
-  .scene[data-scene="0"] .hero-right .rule { justify-content: center; margin: 14px 0; }
-  .scene[data-scene="0"] .hero-right .title { font-size: clamp(62px, 11.8vw, 132px); }
-  .scene[data-scene="0"] .countdown { margin-top: 13px; }
+  .scene[data-scene="0"] .hero-right .rule {
+    justify-content: center;
+    margin: 13px 0;
+  }
+  .scene[data-scene="0"] .hero-right .title {
+    font-size: clamp(47px, 9.5vw, 112px);
+  }
+  .scene[data-scene="0"] .countdown { margin-top: 10px; }
   .scene[data-scene="0"] .character {
-    left: -21vw;
-    bottom: -19vh;
-    width: 91vw;
-    opacity: .5;
+    left: -27vw;
+    bottom: -13vh;
+    width: 93vw;
+    opacity: .38;
   }
   .fanarts {
-    left: 6vw;
-    right: 6vw;
-    top: 53vh;
-    bottom: 7vh;
-    width: 88vw;
-    padding: clamp(17px, 3vw, 34px);
+    left: 3vw;
+    right: 3vw;
+    width: 94vw;
+    top: 34vh;
+    bottom: 5vh;
   }
-  .fanarts-heading h2 { font-size: clamp(31px, 5vw, 52px); }
-  .fanarts-heading p { font-size: clamp(8px, 1.3vw, 14px); }
-  .fanart-card { flex-basis: 67%; }
-  .fanart-card figcaption small { font-size: clamp(8px, 1.2vw, 12px); }
-  .fanart-card figcaption strong { font-size: clamp(20px, 2.8vw, 34px); }
-  .fanarts-bottom { font-size: clamp(8px, 1.1vw, 12px); }
+  .fanarts-heading { padding-bottom: 15px; }
+  .fanarts-heading h2 { font-size: clamp(37px, 5.9vw, 66px); }
+}
+
+/* Celular: título compacto para reservar o máximo de tela ao desenho. */
+@media (max-width: 700px) and (orientation: portrait) {
+  .scene[data-scene="0"] .hero-right {
+    left: 5vw;
+    top: 8vh;
+    width: 90vw;
+    padding: 14px 12px 10px;
+  }
+  .scene[data-scene="0"] .hero-right .title {
+    font-size: clamp(42px, 9.3vw, 67px);
+    margin: 9px 0;
+  }
+  .scene[data-scene="0"] .hero-right .eyebrow {
+    font-size: 8px;
+    letter-spacing: .28em;
+  }
+  .scene[data-scene="0"] .hero-right .rule { margin: 8px 0; }
+  .scene[data-scene="0"] .hero-right .rule::before,
+  .scene[data-scene="0"] .hero-right .rule::after { width: 65px; }
+  .scene[data-scene="0"] .hero-right .subtitle {
+    font-size: 8px;
+    letter-spacing: .12em;
+    padding: 5px 7px;
+  }
+  .scene[data-scene="0"] .countdown {
+    margin-top: 9px;
+    padding: 8px 16px;
+    font-size: clamp(31px, 8.4vw, 40px);
+  }
+  .fanarts {
+    left: 2vw;
+    right: 2vw;
+    width: 96vw;
+    top: 38vh;
+    bottom: 5vh;
+  }
+  .fanarts-heading { padding-bottom: 9px; }
+  .fanarts-heading h2 { font-size: clamp(31px, 8vw, 43px); }
+  .scene[data-scene="0"] .character {
+    left: -34vw;
+    bottom: -9vh;
+    width: 112vw;
+    opacity: .28;
+  }
 }
 
 @media (max-height: 650px) and (orientation: landscape) {
-  .fanarts { top: 15vh; bottom: 11vh; padding: 14px 22px; }
-  .fanarts-heading h2 { margin-top: 7px; }
-  .fanarts-heading { padding-bottom: 8px; }
-  .fanarts-window { margin-top: 9px; }
-  .fanarts-bottom { margin-top: 6px; }
-  .scene[data-scene="0"] .hero-right .title { font-size: clamp(48px, 5vw, 88px); }
+  .fanarts { top: 13vh; bottom: 9vh; }
+  .fanarts-heading { padding-bottom: 6px; }
+  .fanarts-heading h2 { font-size: clamp(24px, 3vw, 42px); }
+  .scene[data-scene="0"] .hero-right .title { font-size: clamp(42px, 5vw, 88px); }
 }
-
 @media (prefers-reduced-motion: reduce) {
   .fanarts-track { transition: none !important; }
 }
