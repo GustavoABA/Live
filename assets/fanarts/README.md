@@ -18,4 +18,10 @@ Como o GitHub Pages é estático e não lista diretórios, `0-iniciando/fanarts.
 
 **Limitação:** é necessário que o repositório permaneça público e que o acesso à API do GitHub esteja disponível. Se a conexão falhar, o site mostra a primeira fanart conhecida (`belle--nihilguh.webp`) como alternativa. Imagens recém-adicionadas só aparecem quando o GitHub Pages as publicar e a API retornar a lista atualizada.
 
-Arte inicial recebida do chat da Twitch, crédito exibido: Belle. A imagem foi enquadrada sem incluir a interface do chat, mantendo o desenho completo.
+## Acervo inicial
+
+Este lote reúne **18 artes** enviadas na conversa. A foto de melhor resolução recebida da fanart da **Belle** substitui a versão pequena da captura do chat, evitando duplicação.
+
+Para as outras 17 artes, os nomes originais não permitem confirmar com segurança os artistas. Por isso, receberam o crédito temporário **Comunidade** (`comunidade--...`). Quando os autores forem identificados, basta renomear os respectivos arquivos com o nome do artista antes de `--`.
+
+Além da descoberta automática pela API, o JavaScript mantém uma lista local das 18 artes como reserva quando houver falha na consulta ao GitHub. Imagens novas continuam sendo descobertas sem alterações manuais se a API estiver disponível.
