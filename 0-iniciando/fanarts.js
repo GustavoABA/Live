@@ -10,61 +10,25 @@
   const endpoint = 'https://api.github.com/repos/GustavoABA/Live/contents/assets/fanarts?ref=main';
   // Acervo de segurança se a API estiver indisponível.
   const fallback = [
-  {
-    "name": "belle--nihilguh.webp"
-  },
-  {
-    "name": "comunidade--01-guhf.webp"
-  },
-  {
-    "name": "comunidade--02-strogonocofis.webp"
-  },
-  {
-    "name": "comunidade--03-guhnoob.webp"
-  },
-  {
-    "name": "comunidade--04-img-20240712-203208.webp"
-  },
-  {
-    "name": "comunidade--05-guhlunar.webp"
-  },
-  {
-    "name": "comunidade--06-57-sem-titulo-20240701170608.webp"
-  },
-  {
-    "name": "comunidade--07-37-sem-titulo-20240506125023.webp"
-  },
-  {
-    "name": "comunidade--09-guh-lunar-vtuber.webp"
-  },
-  {
-    "name": "comunidade--10-3-sem-titulo-20250110235126.webp"
-  },
-  {
-    "name": "comunidade--11-img-20241223-201814.webp"
-  },
-  {
-    "name": "comunidade--12-guh-lunar.webp"
-  },
-  {
-    "name": "comunidade--13-159-sem-titulo.webp"
-  },
-  {
-    "name": "comunidade--14-spoiler-48-sem-titulo-20240923025237.webp"
-  },
-  {
-    "name": "comunidade--15-rn-image-picker-lib-temp-81c77e56-0161-4f33-9798.webp"
-  },
-  {
-    "name": "comunidade--16-65-sem-titulo-20240726063108.webp"
-  },
-  {
-    "name": "comunidade--17-2310696-nrfpmj4s.webp"
-  },
-  {
-    "name": "comunidade--18-60-sem-titulo.webp"
-  },
-    { "name": "comunidade--nihilguh-caderno-colorido.webp" }
+    { name: "belle--nihilguh.webp" },
+    { name: "comunidade--01-guhf.webp" },
+    { name: "comunidade--02-strogonocofis.webp" },
+    { name: "comunidade--03-guhnoob.webp" },
+    { name: "comunidade--04-img-20240712-203208.webp" },
+    { name: "comunidade--05-guhlunar.webp" },
+    { name: "comunidade--06-57-sem-titulo-20240701170608.webp" },
+    { name: "comunidade--07-37-sem-titulo-20240506125023.webp" },
+    { name: "comunidade--09-guh-lunar-vtuber.webp" },
+    { name: "comunidade--10-3-sem-titulo-20250110235126.webp" },
+    { name: "comunidade--11-img-20241223-201814.webp" },
+    { name: "comunidade--12-guh-lunar.webp" },
+    { name: "comunidade--13-159-sem-titulo.webp" },
+    { name: "comunidade--14-spoiler-48-sem-titulo-20240923025237.webp" },
+    { name: "comunidade--15-rn-image-picker-lib-temp-81c77e56-0161-4f33-9798.webp" },
+    { name: "comunidade--16-65-sem-titulo-20240726063108.webp" },
+    { name: "comunidade--17-2310696-nrfpmj4s.webp" },
+    { name: "comunidade--18-60-sem-titulo.webp" },
+    { name: "comunidade--nihilguh-caderno-colorido.webp" }
   ];
   const isImage = name => /\.(png|jpe?g|webp|gif|avif)$/i.test(name);
   const motionOff = new URLSearchParams(location.search).get('motion') === '0'
