@@ -63,8 +63,9 @@
   },
   {
     "name": "comunidade--18-60-sem-titulo.webp"
-  }
-];
+  },
+    { "name": "comunidade--nihilguh-caderno-colorido.webp" }
+  ];
   const isImage = name => /\.(png|jpe?g|webp|gif|avif)$/i.test(name);
   const motionOff = new URLSearchParams(location.search).get('motion') === '0'
     || matchMedia('(prefers-reduced-motion: reduce)').matches;
