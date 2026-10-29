@@ -1,6 +1,7 @@
 
 (() => {
   'use strict';
+  const scriptUrl = document.currentScript ? document.currentScript.src : new URL('../../assets/adam/overlay.js', location.href).href;
   const sceneNumber = Number(document.body.dataset.scene || '0');
   const number = Number.isInteger(sceneNumber) && sceneNumber >= 0 && sceneNumber <= 9 ? sceneNumber : 0;
   const config = [
@@ -90,7 +91,7 @@
   async function loadPortraits(){
     const pics=[...scene.querySelectorAll('[data-portrait]')];
     if (!pics.length) return;
-    const webp=new URL('./adam.webp',document.currentScript?.src||location.href);
+    const webp=new URL('./adam.webp',scriptUrl);
     // The copy in this script's folder is streamer-specific and never uses NihilGuh assets.
     const image=new Image();
     image.onload=()=>pics.forEach(p=>p.src=webp.href);
@@ -109,7 +110,6 @@
     };
     image.src=webp.href;
   }
-  // Document.currentScript is null after async operations. Capture it through the static path in each scene.
   loadPortraits();
 
   const durationRaw=Number(params.get('minutes'));
