@@ -33,8 +33,11 @@ body{background:var(--bg)}
 .goat-yard{position:absolute;inset:auto 0 3.5vh;z-index:11;height:150px;pointer-events:none;overflow:hidden}
 .goat-walker{position:absolute;left:0;bottom:0;width:var(--goat-size);height:auto;animation:goat-cross var(--goat-duration) linear var(--goat-delay) infinite;will-change:transform;opacity:.98;filter:drop-shadow(0 8px 15px rgba(13,86,206,.38))}
 .goat-walker svg{display:block;width:100%;height:auto;overflow:visible}
-.goat-walker.reverse .goat-body{transform:scaleX(-1);transform-origin:center}
-.goat-body{animation:goat-bob .48s ease-in-out infinite alternate}
+/* SVG original olha para a esquerda: espelha ao caminhar para a direita. */
+.goat-body{transform:scaleX(-1);transform-box:view-box;transform-origin:center;animation:goat-bob .48s ease-in-out infinite alternate}
+/* Percurso inverso: mantém a cabeça à esquerda, acompanhando o deslocamento. */
+.goat-walker.reverse{animation-name:goat-cross-reverse}
+.goat-walker.reverse .goat-body{transform:none}
 .goat-leg-a,.goat-leg-d{transform-origin:50% 55%;animation:goat-step .45s ease-in-out infinite alternate}.goat-leg-b,.goat-leg-c{transform-origin:50% 55%;animation:goat-step .45s ease-in-out infinite alternate-reverse}
 .goat-walker.sleep{animation:none;transform:translateX(var(--goat-park))}
 .goat-walker.sleep .goat-body,.goat-walker.sleep .goat-leg-a,.goat-walker.sleep .goat-leg-b,.goat-walker.sleep .goat-leg-c,.goat-walker.sleep .goat-leg-d{animation:none}
@@ -93,6 +96,7 @@ h1 em{font-style:inherit;color:#79e5ff}
 @keyframes fire-dance{0%{transform:rotate(-5deg) scaleX(.9) scaleY(.95)}100%{transform:rotate(5deg) scaleX(1.06) scaleY(1.09)}}
 @keyframes spark-float{0%{opacity:0;transform:translate3d(0,20px,0)}20%{opacity:.8}85%{opacity:.55}100%{opacity:0;transform:translate3d(32px,-100px,0)}}
 @keyframes goat-cross{from{transform:translateX(-25vw)}to{transform:translateX(125vw)}}
+@keyframes goat-cross-reverse{from{transform:translateX(125vw)}to{transform:translateX(-25vw)}}
 @keyframes goat-step{from{rotate:-13deg}to{rotate:16deg}}
 @keyframes goat-bob{from{translate:0 0}to{translate:0 -4px}}
 @keyframes pulse{50%{opacity:.36;box-shadow:0 0 4px #46aeff}}
