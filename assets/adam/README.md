@@ -16,8 +16,8 @@ Cenas: `/Live/0-iniciando/Adam/`, `/Live/1-entrada/Adam/`, `/Live/2-chat/Adam/`,
 ## Arquivos do Adam
 - `assets/adam/overlay.css`: tema visual completo
 - `assets/adam/overlay.js`: cenas, cronômetros, cabritinhos SVG, efeitos e carregamento do avatar
-- `assets/adam/adam-base64.txt`: prévia transparente compacta enviada anteriormente
-- Opcional: adicione `assets/adam/adam.webp` com resolução maior. Ele será priorizado sobre a prévia compacta.
+- `assets/adam/adam.webp`: ilustração original recriada em HD (1122 × 1402 pixels), WebP com transparência. É a imagem principal de todas as cenas.
+- `assets/adam/adam-base64.txt`: mantém a prévia AVIF compacta como fallback se o WebP estiver indisponível.
 
 ## Parâmetros
 - `?guide=1`: exibe marcações das áreas reservadas ao OBS.
@@ -27,3 +27,6 @@ Cenas: `/Live/0-iniciando/Adam/`, `/Live/1-entrada/Adam/`, `/Live/2-chat/Adam/`,
 
 ## Configuração OBS
 Crie uma fonte Navegador para cada URL que quiser usar. Para horizontal, use 1920x1080; para vertical, use 1080x1920. Conteúdo de jogo, chat e VTuber são fontes separadas: o tema fornece áreas e molduras, não conecta automaticamente widgets ou contas de terceiros.
+
+## Direção dos cabritinhos
+O desenho SVG foi criado olhando para a esquerda. Para caminhar para a direita, espelhamos a ilustração; para caminhar para a esquerda, preservamos a orientação original. A classe `.reverse` altera também a direção do percurso.
