@@ -1,0 +1,56 @@
+/* Adam · Blue Moon Club — tema independente das cenas NihilGuh */
+:root {
+  --night: #030914; --plum: #091b33;
+  --lavender: #73b9ff; --lavender-soft: #467ee9;
+  --rose: #b3d5ff; --gold: #79dcff;
+  --ink: #f3f9ff; --muted: #b7c9e6;
+  --line: rgba(95,169,255,.58);
+  --glass: rgba(4,13,30,.73);
+}
+body {background:#030914}
+.scene {--accent:#3884ff !important;background:#030914}
+.scene::before {opacity:.65;background:
+  radial-gradient(ellipse at 20% 24%,rgba(22,103,231,.3),transparent 43%),
+  radial-gradient(ellipse at 82% 76%,rgba(52,91,195,.24),transparent 40%)}
+.scene::after {background:linear-gradient(105deg,transparent 40%,rgba(113,204,255,.03) 49%,rgba(127,183,255,.09) 51%,transparent 61%)}
+.backdrop {background:
+  radial-gradient(ellipse 60vw 55vh at 70% 30%,rgba(14,80,180,.28),transparent 78%),
+  radial-gradient(ellipse 45vw 50vh at 12% 85%,rgba(38,52,136,.28),transparent 80%),
+  radial-gradient(circle at 75% 20%,rgba(137,201,255,.2) 0 3.5vw,rgba(39,80,161,.06) 4vw,transparent 14vw),
+  linear-gradient(126deg,#030713 0%,#08182e 48%,#050e1e 100%) !important;
+  background-size:cover !important;filter:none !important}
+.backdrop::before {background:linear-gradient(100deg,rgba(1,8,21,.63),transparent 54%,rgba(1,6,19,.5))}
+.backdrop::after {box-shadow:inset 0 0 16vw 4vw rgba(0,5,14,.67)}
+.stars i {background:#87cdff;box-shadow:0 0 17px rgba(114,207,255,.85)}
+.ornament-border {border-color:rgba(90,172,255,.26)}
+.ornament-border::before,.ornament-border::after {content:'♥';color:#4d8aff;text-shadow:0 0 15px rgba(84,143,255,.6)}
+.brand strong {font-family:var(--sans);font-weight:600;letter-spacing:.19em}
+.brand span {color:#a7d8ff}
+.brand::after {background:linear-gradient(90deg,#64caff,transparent)}
+.scene-index b,.panel-label,.slot-number,.eyebrow {color:#8dd7ff}
+.panel,.slot {border-color:rgba(88,160,250,.5) !important;background-color:rgba(3,11,25,.38) !important;box-shadow:inset 0 0 38px rgba(30,99,207,.06),0 0 35px rgba(4,30,90,.08) !important}
+.panel::after,.slot::after {border-color:rgba(68,155,255,.22) !important}
+.countdown {background:rgba(4,23,50,.63);border-color:rgba(114,196,255,.65) !important;color:#f4faff !important}
+.hero .title,.emergency-card h1 {text-shadow:0 10px 34px rgba(0,0,0,.85),0 0 48px rgba(43,116,255,.24) !important}
+.subtitle {color:#a9d6fa}
+.rule {color:#83ceff}
+.footer {color:#a5bcd8}
+.character {filter:drop-shadow(0 10px 40px rgba(7,37,123,.55)) !important}
+.character img {object-fit:contain}
+.character:not([data-character]) {animation:adam-float 5.7s ease-in-out infinite !important}
+.adam-sticker {position:absolute;z-index:7;right:1.6vw;bottom:3.2vh;width:clamp(110px,11.5vw,245px);max-height:25vh;object-fit:contain;object-position:bottom right;pointer-events:none;filter:drop-shadow(0 7px 25px rgba(42,118,255,.45));opacity:.87;animation:adam-float 6s ease-in-out infinite}
+.scene[data-scene='0'] .character {left:-2vw;bottom:-28vh;width:min(49vw,860px);opacity:.8}
+.scene[data-scene='0'] .hero-right {border-left-color:rgba(115,190,255,.7);background:linear-gradient(90deg,rgba(3,15,36,.66),transparent)}
+.scene[data-scene='0'] .fanarts-heading h2 {color:#e9f6ff;text-shadow:0 3px 22px #000,0 0 22px rgba(50,145,255,.23)}
+.scene[data-scene='3'] .adam-sticker {right:2vw;bottom:6vh;width:clamp(90px,9vw,180px);opacity:.56}
+.scene[data-scene='9'] .adam-sticker {opacity:.27;right:3vw;bottom:7vh;max-height:20vh}
+.scene[data-scene='9'] .emergency-card {background:rgba(4,12,29,.8);border-color:rgba(94,167,255,.8);box-shadow:0 0 80px rgba(27,103,204,.12)}
+.scene[data-scene='9'] .emergency-card .icon {color:#80d3ff}
+.motion-off .character,.motion-off .adam-sticker,.obs-paused .character,.obs-paused .adam-sticker {animation:none !important}
+@keyframes adam-float {0%,100%{transform:translateY(0)}50%{transform:translateY(-1.3vh)}}
+@media (orientation:portrait) {
+ .adam-sticker {width:clamp(100px,25vw,240px);right:4vw;bottom:3vh;opacity:.64}
+ .scene[data-scene='0'] .character {left:-23vw;bottom:-6vh;width:90vw;opacity:.32}
+ .scene[data-scene='0'] .hero-right {border-top-color:rgba(100,190,255,.7)}
+}
+@media (prefers-reduced-motion:reduce){.character,.adam-sticker{animation:none !important}}
