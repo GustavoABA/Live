@@ -1,0 +1,103 @@
+/* NihilGuh Ambient Motion System — live OBS overlays, inspired by HyperFrames/GSAP authoring.
+   No Adam selector or resource is ever targeted. CSS fallback works without GSAP. */
+:root{--amb-cat:#15101e;--amb-ear:#d4a8de;--amb-eye:#f8d7a2;--amb-outline:#8f70a4;--amb-glow:#ba9bea;--amb-mist:rgba(194,161,233,.26);--amb-ghost:#f2edff}
+body.halloween{--amb-cat:#100d15;--amb-ear:#8c53ae;--amb-eye:#aaff65;--amb-outline:#77439b;--amb-glow:#88fd69;--amb-mist:rgba(112,245,117,.27);--amb-ghost:#e0ffea;--accent:#9cf36b;--gold:#c3fa80;--lavender:#b8f99c;--muted:#a9caa9;--line:rgba(135,255,111,.58);--glass:rgba(9,24,11,.62)}
+/* Green necromancy balances orange pumpkins and purple silhouettes. */
+body.halloween:not(.halloween-special) .scene{background:#05090b}
+body.halloween:not(.halloween-special) .backdrop{filter:saturate(.66) hue-rotate(275deg) brightness(.7)}
+body.halloween:not(.halloween-special) .backdrop::before{background:radial-gradient(ellipse at 27% 68%,rgba(68,203,82,.21),transparent 38%),radial-gradient(ellipse at 74% 26%,rgba(118,40,153,.18),transparent 43%),linear-gradient(118deg,rgba(3,9,5,.83),rgba(16,14,19,.44),rgba(3,6,5,.84))}
+body.halloween:not(.halloween-special) .scene::before{background:radial-gradient(ellipse at 13% 73%,rgba(73,246,107,.18),transparent 42%),radial-gradient(ellipse at 77% 33%,rgba(128,64,182,.19),transparent 39%)}
+body.halloween:not(.halloween-special) .stars i{background:#9cff93;box-shadow:0 0 14px rgba(123,255,145,.68)}
+body.halloween:not(.halloween-special) .ornament-border{border-color:rgba(124,238,113,.31)}
+body.halloween:not(.halloween-special) .ornament-border::before,body.halloween:not(.halloween-special) .ornament-border::after{color:#b4fb72}
+body.halloween:not(.halloween-special) .brand::after{background:linear-gradient(90deg,#9cfa77,rgba(255,137,50,.34),transparent)}
+body.halloween:not(.halloween-special) .panel,body.halloween:not(.halloween-special) .slot{border-color:rgba(118,247,121,.57);background:linear-gradient(146deg,rgba(6,23,9,.52),rgba(21,9,24,.18));box-shadow:inset 0 0 22px rgba(55,213,83,.055),0 20px 52px rgba(0,0,0,.3)}
+body.halloween:not(.halloween-special) .panel-label,body.halloween:not(.halloween-special) .slot-number{color:#c1ff94}
+body.halloween:not(.halloween-special) .deco-strip,body.halloween:not(.halloween-special) .tea-note{color:rgba(185,255,159,.76)}
+body.halloween:not(.halloween-special) .countdown{border-color:#9dec82;box-shadow:0 0 25px rgba(70,241,76,.11)}
+body.halloween:not(.halloween-special) .emergency-card{border-color:#9afa84;box-shadow:0 0 70px rgba(60,232,102,.13),inset 0 0 70px rgba(53,243,111,.07)}
+body.halloween:not(.halloween-special) .emergency-card .icon{color:#b5fb85}
+body.halloween:not(.halloween-special) .halloween-decor::before{background:radial-gradient(ellipse,rgba(100,238,135,.28),rgba(80,32,108,.12) 50%,transparent 72%)}
+body.halloween:not(.halloween-special) .mote{background:#a4fd97;box-shadow:0 0 13px rgba(134,244,126,.55)}
+body.halloween:not(.halloween-special) .scene-index b{color:#bcf990}
+/* Halloween special starting scene uses a bespoke layout and must not be replaced. */
+body.halloween-special{--amb-cat:#120e17;--amb-ear:#a0649e;--amb-eye:#aeff81;--amb-outline:#884677;--amb-glow:#8ff56a;--amb-mist:rgba(125,232,140,.26);--amb-ghost:#e7ffed}
+body.halloween-special .scene{background:#070a08}
+body.halloween-special .backdrop{filter:saturate(.63) hue-rotate(268deg) contrast(1.12)}
+body.halloween-special .backdrop::after{background:radial-gradient(circle at 76% 37%,rgba(100,231,110,.15),transparent 33%),linear-gradient(0deg,rgba(2,6,3,.9),transparent 50%)}
+body.halloween-special .moon{background:radial-gradient(circle at 35% 28%,#efffdd 0 6%,transparent 6.4%),radial-gradient(circle at 65% 60%,rgba(49,102,43,.19) 0 9%,transparent 9.3%),#b8f695;box-shadow:0 0 50px rgba(112,246,134,.31),0 0 155px rgba(48,209,82,.18)}
+body.halloween-special .mist{background:radial-gradient(ellipse,rgba(97,201,119,.28),rgba(53,61,80,.1) 52%,transparent 72%)}
+body.halloween-special .hero{border-left-color:#a7f88c;background:linear-gradient(100deg,rgba(5,13,8,.34),rgba(8,17,11,.88));box-shadow:0 18px 65px rgba(0,0,0,.35),inset 1px 0 rgba(158,255,128,.12)}
+body.halloween-special .eyebrow,body.halloween-special .rule{color:#bcff9c}
+body.halloween-special .hero h1{text-shadow:0 10px 40px #000,0 0 34px rgba(122,252,111,.21)}
+body.halloween-special .countdown{border-color:rgba(149,250,121,.75);box-shadow:0 0 28px rgba(91,244,92,.12)}
+body.halloween-special .countdown span{color:#b2ff84}
+body.halloween-special .brand::after{background:linear-gradient(90deg,#9ffb76,transparent)}
+body.halloween-special .scene-index b{color:#b3fb84}
+body.halloween-special .web{opacity:.56;filter:sepia(.5) hue-rotate(55deg)}
+body.halloween-special .hero p{color:#c0e9bf}
+body.halloween-special .pumpkins{filter:drop-shadow(0 0 8px rgba(134,249,80,.18))}
+@media(orientation:portrait){body.halloween-special .hero{border-top-color:#a7f88c;border-left:0}}
+/* Effects are pointer-events:none, so they never block OBS overlays or browser controls. */
+.amb-root{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden;contain:layout style;isolation:isolate}
+.amb-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.amb-background{z-index:0}.amb-actors{z-index:1}.amb-spiders{z-index:2}.amb-edges{z-index:3}
+.amb-floor-glow{position:absolute;bottom:-7vh;left:-8vw;width:116vw;height:22vh;background:radial-gradient(ellipse at center,var(--amb-mist),transparent 70%);filter:blur(20px);opacity:.6;animation:amb-glow-pulse 10s ease-in-out infinite alternate}
+.amb-cat{position:absolute;left:0;bottom:var(--base-y,6vh);width:var(--width,110px);height:auto;will-change:transform,opacity;opacity:var(--opacity,.84)}
+.amb-cat.run-right{animation:amb-run-right var(--duration,24s) linear var(--delay,0s) infinite}
+.amb-cat.run-left{animation:amb-run-left var(--duration,24s) linear var(--delay,0s) infinite}
+.amb-cat.run-left .amb-body{transform:scaleX(-1)}
+.amb-cat svg{display:block;width:100%;height:auto;overflow:visible}
+.amb-cat .amb-body{transform-origin:50% 65%;animation:amb-cat-hop .56s ease-in-out infinite alternate}
+.amb-cat .amb-paw-a,.amb-cat .amb-paw-d{transform-origin:50% 80%;animation:amb-cat-paw .28s ease-in-out infinite alternate}
+.amb-cat .amb-paw-b,.amb-cat .amb-paw-c{transform-origin:50% 80%;animation:amb-cat-paw .28s ease-in-out infinite alternate-reverse}
+.amb-cat .amb-tail{transform-origin:80% 68%;animation:amb-tail-swish .8s ease-in-out infinite alternate}
+.amb-cat .amb-eye{fill:var(--amb-eye)}.amb-cat .amb-fur{fill:var(--amb-cat);stroke:var(--amb-outline)}.amb-cat .amb-inner{fill:var(--amb-ear)}
+.amb-ghost{position:absolute;left:0;top:var(--ghost-y,47%);width:var(--width,93px);opacity:var(--opacity,.65);filter:drop-shadow(0 0 13px var(--amb-glow));animation:amb-ghost-cross var(--duration,30s) linear var(--delay,0s) infinite}
+.amb-ghost.reverse{animation-name:amb-ghost-cross-reverse}
+.amb-ghost.reverse svg{transform:scaleX(-1)}
+.amb-ghost svg{width:100%;display:block;overflow:visible}
+.amb-ghost .amb-ghost-body{fill:var(--amb-ghost);stroke:var(--amb-glow);stroke-width:2;animation:amb-ghost-float 3.6s ease-in-out infinite alternate}
+.amb-ghost .amb-ghost-eye{fill:#201731}
+.amb-ghost .amb-ghost-blush{fill:#eeacd3;opacity:.7}
+.amb-spider{position:absolute;top:var(--top,-3vh);left:var(--sx,5vw);width:var(--width,42px);transform-origin:center top;opacity:.82;filter:drop-shadow(0 0 6px var(--amb-glow));animation:amb-spider-drop var(--duration,20s) ease-in-out var(--delay,0s) infinite alternate}
+.amb-spider svg{width:100%;display:block}.amb-spider .amb-spider-core{fill:var(--amb-cat);stroke:var(--amb-glow);stroke-width:1.5}
+.amb-spider .amb-spider-eye{fill:var(--amb-eye)}.amb-spider .amb-spider-leg{stroke:var(--amb-outline);stroke-width:5;stroke-linecap:round;fill:none}
+.amb-spider .amb-thread{position:absolute;width:1px;height:170px;left:50%;bottom:85%;background:linear-gradient(to top,var(--amb-glow),transparent);transform-origin:bottom}
+.amb-spider .amb-spider-wiggle{animation:amb-spider-wiggle 3s ease-in-out infinite alternate}
+.amb-spider.crawler{top:var(--top,8vh);animation:amb-spider-crawl var(--duration,35s) linear var(--delay,0s) infinite}
+.amb-spider.crawler.reverse{animation-name:amb-spider-crawl-reverse}
+.amb-spider.crawler .amb-thread{display:none}
+.amb-leaf{position:absolute;top:var(--y);left:var(--x);font-size:var(--size);color:var(--amb-glow);opacity:0;filter:drop-shadow(0 0 8px var(--amb-glow));animation:amb-leaf-drift var(--duration) ease-in-out var(--delay) infinite;will-change:transform,opacity}
+.amb-crescent{position:absolute;right:6vw;top:20vh;width:clamp(60px,8vw,144px);aspect-ratio:1;border-radius:50%;box-shadow:inset 13px 1px 0 0 rgba(207,181,242,.53),-8px 2px 23px rgba(181,130,225,.07);opacity:.23;transform:rotate(-22deg);animation:amb-glow-pulse 8s ease-in-out infinite alternate}
+body.halloween .amb-crescent,body.halloween-special .amb-crescent{box-shadow:inset 13px 1px 0 0 rgba(181,255,125,.55),-8px 2px 23px rgba(98,237,100,.13)}
+.amb-portal{position:absolute;inset:0;z-index:12;pointer-events:none;background:radial-gradient(ellipse at center,transparent 30%,rgba(12,7,22,.75));opacity:0;animation:amb-portal-reveal 1.6s cubic-bezier(.19,.6,.2,1) both}
+body.halloween .amb-portal,body.halloween-special .amb-portal{background:radial-gradient(ellipse at center,transparent 24%,rgba(27,69,29,.7) 65%,rgba(4,17,5,.9))}
+body[data-amb-performance="low"] .amb-ghost,body[data-amb-performance="low"] .amb-spider.crawler{display:none}
+body[data-amb-performance="low"] .amb-floor-glow{display:none}
+body[data-scene="3"] .amb-root,body .scene[data-scene="3"] .amb-root{opacity:.53}
+body .scene[data-scene="4"] .amb-root,body .scene[data-scene="6"] .amb-root{opacity:.68}
+body.halloween .scene[data-scene="9"] .amb-root{opacity:.53}
+.motion-off .amb-root,.obs-paused .amb-root,body.amb-motion-off .amb-root{display:none!important}
+@keyframes amb-run-right{0%{transform:translate3d(-20vw,0,0);opacity:0}7%{opacity:var(--opacity,.84)}93%{opacity:var(--opacity,.84)}100%{transform:translate3d(120vw,0,0);opacity:0}}
+@keyframes amb-run-left{0%{transform:translate3d(120vw,0,0);opacity:0}7%{opacity:var(--opacity,.84)}93%{opacity:var(--opacity,.84)}100%{transform:translate3d(-20vw,0,0);opacity:0}}
+@keyframes amb-cat-hop{from{translate:0 0}to{translate:0 -5px}}
+@keyframes amb-cat-paw{from{rotate:-12deg}to{rotate:16deg}}
+@keyframes amb-tail-swish{from{rotate:-10deg}to{rotate:10deg}}
+@keyframes amb-ghost-cross{0%{transform:translate3d(-15vw,0,0) rotate(-5deg);opacity:0}12%{opacity:var(--opacity,.65)}88%{opacity:var(--opacity,.65)}100%{transform:translate3d(115vw,-8vh,0) rotate(4deg);opacity:0}}
+@keyframes amb-ghost-cross-reverse{0%{transform:translate3d(115vw,0,0) rotate(4deg);opacity:0}12%{opacity:var(--opacity,.65)}88%{opacity:var(--opacity,.65)}100%{transform:translate3d(-15vw,-9vh,0) rotate(-5deg);opacity:0}}
+@keyframes amb-ghost-float{from{translate:0 -2px}to{translate:0 10px}}
+@keyframes amb-spider-drop{from{transform:translateY(-8vh) rotate(-8deg)}35%{transform:translateY(18vh) rotate(9deg)}70%{transform:translateY(37vh) rotate(-9deg)}to{transform:translateY(8vh) rotate(6deg)}}
+@keyframes amb-spider-wiggle{from{rotate:-8deg}to{rotate:9deg}}
+@keyframes amb-spider-crawl{0%{transform:translateX(-18vw) rotate(0);opacity:0}8%,92%{opacity:.8}100%{transform:translateX(118vw) rotate(4deg);opacity:0}}
+@keyframes amb-spider-crawl-reverse{0%{transform:translateX(118vw) rotate(0);opacity:0}8%,92%{opacity:.8}100%{transform:translateX(-18vw) rotate(-4deg);opacity:0}}
+@keyframes amb-leaf-drift{0%,100%{opacity:0;transform:translate3d(0,15px,0) rotate(0)}25%,67%{opacity:.66}90%{opacity:0}70%{transform:translate3d(34px,-8vh,0) rotate(55deg)}}
+@keyframes amb-glow-pulse{from{opacity:.33}to{opacity:.75}}
+@keyframes amb-portal-reveal{0%{opacity:1;transform:scale(1.2)}60%{opacity:.55}100%{opacity:0;transform:scale(1)}}
+@media(orientation:portrait){.amb-crescent{right:9vw;top:36vh;opacity:.15}.amb-spider .amb-thread{height:130px}.amb-cat{bottom:var(--base-y,5vh)}.amb-floor-glow{height:13vh}.amb-ghost{opacity:calc(var(--opacity,.65) * .75)}}
+@media(max-width:760px){.amb-spider{opacity:.65}}
+@media(prefers-reduced-motion:reduce){.amb-root{display:none!important}}
+
+/* Independent animation lifecycle for the standalone Halloween countdown. */
+body.amb-hidden .amb-root *,body.amb-hidden .amb-root *::before,body.amb-hidden .amb-root *::after{animation-play-state:paused!important}
+body.amb-hidden .amb-root .amb-portal{opacity:0}
