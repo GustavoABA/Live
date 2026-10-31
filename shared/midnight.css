@@ -1,0 +1,123 @@
+/* NihilGuh: Midnight Cat Club / Celestial Edition
+   Normal scenes only. Halloween still uses shared/ambient.css+ambient.js.
+   Live-browser CSS fallback + GSAP motion authored like a HyperFrames composition. */
+body:not(.halloween):not(.halloween-special) .amb-root[data-theme="midnight"]{
+ --nyx-ice:#e9d6fa;--nyx-lilac:#b793ed;--nyx-rose:#eebed5;
+ --nyx-gold:#ebca97;--nyx-deep:#25182f;
+}
+.amb-root[data-theme="midnight"]{overflow:hidden}
+.amb-root[data-theme="midnight"] .amb-floor-glow{
+  bottom:-9vh;height:21vh;opacity:.46;
+  background:radial-gradient(ellipse at 40% 50%,rgba(208,159,235,.21),rgba(228,171,195,.08) 42%,transparent 73%);
+}
+.amb-root[data-theme="midnight"] .amb-crescent{opacity:.2;right:5%;top:12%}
+.amb-root[data-theme="midnight"] .amb-cat{
+ --amb-cat:#221a31;--amb-outline:#b18ccf;--amb-ear:#ecb6d5;--amb-eye:#ffe7a5;
+ bottom:var(--base-y,2vh);opacity:var(--opacity,.85);
+ filter:drop-shadow(0 2px 9px rgba(216,161,244,.5));z-index:4
+}
+.amb-root[data-theme="midnight"] .amb-cat svg{overflow:visible}
+.amb-root[data-theme="midnight"] .amb-cat .amb-body{
+ transform-origin:50% 65%;
+ animation:nyx-bounce .52s ease-in-out infinite alternate
+}
+.amb-root[data-theme="midnight"] .amb-cat.run-left .amb-body{transform:scaleX(-1);scale:1}
+.amb-root[data-theme="midnight"] .amb-cat .amb-tail{transform-origin:25% 60%;animation:nyx-tail .62s ease-in-out infinite alternate}
+.amb-root[data-theme="midnight"] .amb-cat .amb-paw-a,
+.amb-root[data-theme="midnight"] .amb-cat .amb-paw-c{transform-box:fill-box;transform-origin:50% 15%;animation:nyx-stride .27s ease-in-out infinite alternate}
+.amb-root[data-theme="midnight"] .amb-cat .amb-paw-b,
+.amb-root[data-theme="midnight"] .amb-cat .amb-paw-d{transform-box:fill-box;transform-origin:50% 15%;animation:nyx-stride .27s ease-in-out infinite alternate-reverse}
+.amb-root[data-theme="midnight"] .amb-cat .nyx-ear-twitch{transform-box:fill-box;transform-origin:bottom center;animation:nyx-ear 3.5s ease-in-out infinite}
+.amb-root[data-theme="midnight"] .amb-cat .nyx-heart{filter:drop-shadow(0 0 3px rgba(245,210,244,.6))}
+.amb-root[data-theme="midnight"] .amb-cat .nyx-cheek{fill:#e8a7c8;opacity:.75}
+.amb-root[data-theme="midnight"] .amb-cat .nyx-star-mark{fill:#e6bded}
+.amb-root[data-theme="midnight"] .amb-leaf{opacity:0;filter:drop-shadow(0 0 5px rgba(219,182,247,.5))}
+.amb-root[data-theme="midnight"] .amb-portal{
+ background:radial-gradient(ellipse at center,transparent 34%,rgba(36,20,47,.5) 79%,rgba(10,5,20,.72));
+ animation:amb-portal-reveal 1.6s ease-out both
+}
+/* Ambient visual layers stay translucent, focus remains on the stream. */
+.nyx-magic{z-index:0!important;opacity:.92}
+.nyx-trails{z-index:1!important}
+.nyx-orbits{z-index:2!important}
+.nyx-paws{z-index:3!important}
+.nyx-frame-glow{position:absolute;inset:1.8vmin;border:1px solid rgba(214,173,235,.12);border-radius:2px;box-shadow:inset 0 0 45px rgba(191,148,233,.025),0 0 22px rgba(187,134,229,.07);animation:nyx-frame 10s ease-in-out infinite alternate}
+.nyx-frame-glow::before,.nyx-frame-glow::after{content:"";position:absolute;width:clamp(70px,12vw,230px);height:1px;left:2%;top:3%;background:linear-gradient(90deg,transparent,#e1b3e6c9,transparent);box-shadow:0 0 14px #b787d5b0;animation:nyx-beam 11s ease-in-out infinite alternate}
+.nyx-frame-glow::after{left:auto;right:2%;top:auto;bottom:3%;animation-delay:-5s}
+.nyx-nebula{position:absolute;border-radius:50%;filter:blur(32px);pointer-events:none;opacity:.25;animation:nyx-nebula-drift 22s ease-in-out infinite alternate;will-change:transform}
+.nyx-nebula.left{width:28vw;height:36vh;left:-14vw;top:8vh;background:radial-gradient(ellipse,rgba(202,153,237,.42),transparent 65%)}
+.nyx-nebula.right{width:28vw;height:33vh;right:-13vw;bottom:7vh;background:radial-gradient(ellipse,rgba(239,170,207,.37),transparent 70%);animation-delay:-9s}
+.nyx-constellation{position:absolute;width:clamp(110px,20vw,360px);height:auto;opacity:.42;overflow:visible;filter:drop-shadow(0 0 8px rgba(206,172,245,.27));animation:nyx-constellation-float 14s ease-in-out infinite alternate}
+.nyx-constellation.top-left{top:13vh;left:4vw;transform:rotate(-12deg)}
+.nyx-constellation.bottom-right{bottom:14vh;right:2vw;transform:rotate(23deg) scale(.7)}
+.nyx-constellation .nyx-link{fill:none;stroke:var(--nyx-lilac);stroke-width:1.2;stroke-dasharray:5 10;animation:nyx-link-move 14s linear infinite}
+.nyx-constellation .nyx-point{fill:var(--nyx-ice);filter:drop-shadow(0 0 4px var(--nyx-lilac));animation:nyx-point-pulse 4s ease-in-out infinite alternate}
+.nyx-ring{position:absolute;width:clamp(65px,10vw,190px);aspect-ratio:1;border-radius:50%;border:1px solid rgba(211,169,247,.15);box-shadow:0 0 24px rgba(211,164,247,.04),inset 0 0 18px rgba(213,183,242,.07);opacity:.54;animation:nyx-ring-orbit 45s linear infinite}
+.nyx-ring::before{content:"";position:absolute;inset:13%;border:1px dashed rgba(225,191,249,.25);border-radius:50%}
+.nyx-ring::after{content:"✦";position:absolute;top:-12px;left:48%;font-size:20px;color:#f2d4f5;text-shadow:0 0 11px #c89ade}
+.nyx-ring.a{top:11vh;right:3vw}.nyx-ring.b{bottom:15vh;left:4vw;width:clamp(50px,7vw,130px);animation-direction:reverse;opacity:.3}
+.nyx-comet{position:absolute;left:0;top:var(--top,20%);width:clamp(50px,9vw,155px);height:2px;opacity:0;
+ background:linear-gradient(90deg,transparent,rgba(227,206,248,.45) 72%,#fff2ff);transform:rotate(-17deg);
+ transform-origin:100% 50%;filter:drop-shadow(0 0 7px rgba(205,163,242,.82));
+ animation:nyx-comet var(--duration,21s) ease-in var(--delay,0s) infinite;will-change:transform,opacity}
+.nyx-comet::after{content:"";position:absolute;right:-2px;top:-2px;width:6px;height:6px;border-radius:50%;background:#fff5f9;box-shadow:0 0 14px 4px rgba(231,195,250,.7)}
+.nyx-lantern{position:absolute;width:var(--size,32px);height:var(--size,32px);left:var(--x,50%);top:var(--y,40%);
+ border-radius:50%;border:1px solid rgba(238,205,244,.5);background:radial-gradient(circle at 36% 30%,#fffafa,rgba(231,186,239,.48) 29%,rgba(166,118,209,.12) 58%,transparent 75%);
+ box-shadow:0 0 12px 3px rgba(234,193,249,.24),0 0 38px rgba(239,199,246,.1);opacity:.65;
+ animation:nyx-lantern-float var(--duration,8s) ease-in-out var(--delay,0s) infinite alternate;will-change:transform}
+.nyx-lantern::after{content:"";position:absolute;left:25%;top:22%;width:18%;height:18%;border-radius:50%;background:#fff;filter:blur(2px)}
+.nyx-moth{position:absolute;left:var(--x,10%);top:var(--y,20%);width:var(--size,31px);opacity:.64;
+ transform-origin:center;animation:nyx-moth-drift var(--duration,12s) ease-in-out var(--delay,0s) infinite alternate;will-change:transform}
+.nyx-moth svg{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 0 5px rgba(215,182,233,.42))}
+.nyx-moth .nyx-wing-left{transform-origin:50% 55%;animation:nyx-wing-left .22s ease-in-out infinite alternate}
+.nyx-moth .nyx-wing-right{transform-origin:50% 55%;animation:nyx-wing-right .22s ease-in-out infinite alternate}
+.nyx-moth .nyx-wings{fill:rgba(235,201,244,.82);stroke:rgba(171,137,220,.8);stroke-width:1.2}
+.nyx-moth .nyx-body{fill:#d4b4e7}
+.nyx-sparkle{position:absolute;left:var(--x,50%);top:var(--y,50%);width:var(--size,9px);aspect-ratio:1;
+ opacity:0;background:radial-gradient(circle,rgba(255,235,255,.9),rgba(225,187,248,.6) 40%,transparent 72%);
+ box-shadow:0 0 12px rgba(209,156,244,.52);border-radius:50%;
+ animation:nyx-sparkle var(--duration,6s) ease-in-out var(--delay,0s) infinite}
+.nyx-pawprint{position:absolute;left:var(--x,5vw);bottom:var(--bottom,4vh);width:clamp(11px,1.2vw,18px);height:auto;opacity:0;transform:rotate(var(--angle,-15deg));
+ animation:nyx-pawstep 9s ease-in-out var(--delay,0s) infinite}
+.nyx-pawprint svg{display:block;width:100%;height:auto;fill:rgba(224,179,239,.64);filter:drop-shadow(0 0 6px rgba(222,177,249,.36))}
+.nyx-petal{position:absolute;left:var(--x,50%);top:var(--y,0);width:var(--size,12px);height:var(--size,12px);opacity:0;
+ border-radius:14% 75% 18% 65%;background:linear-gradient(135deg,#f0bbdb,#b595ec);transform-origin:center;
+ filter:drop-shadow(0 0 6px rgba(244,180,236,.33));animation:nyx-petal-fall var(--duration,16s) linear var(--delay,0s) infinite}
+.nyx-sweep{position:absolute;inset:0;opacity:0;pointer-events:none;transform:translateX(-120%);
+ background:linear-gradient(108deg,transparent 40%,rgba(235,199,246,.025) 47%,rgba(248,219,248,.055) 50%,transparent 56%);
+ animation:nyx-sweep 19s ease-in-out infinite}
+.nyx-gsap .nyx-comet,.nyx-gsap .nyx-moth{animation:none}
+body[data-amb-performance="low"] .nyx-nebula,body[data-amb-performance="low"] .nyx-moth,body[data-amb-performance="low"] .nyx-petal{display:none}
+body .scene[data-scene="3"] .nyx-constellation,body .scene[data-scene="4"] .nyx-constellation,body .scene[data-scene="6"] .nyx-constellation{opacity:.16}
+body .scene[data-scene="3"] .nyx-sweep,body .scene[data-scene="4"] .nyx-sweep,body .scene[data-scene="6"] .nyx-sweep{opacity:0}
+body .scene[data-scene="0"] .nyx-constellation.top-left{top:30vh;opacity:.2}
+body .scene[data-scene="9"] .nyx-ring{opacity:.19}
+.motion-off .nyx-magic,.obs-paused .nyx-magic,.amb-motion-off .nyx-magic{display:none!important}
+.amb-hidden .nyx-magic *,.amb-hidden .nyx-trails *,.amb-hidden .nyx-orbits *,.amb-hidden .nyx-paws *{animation-play-state:paused!important}
+@keyframes nyx-bounce{from{translate:0 0}to{translate:0 -2px}}
+@keyframes nyx-tail{from{rotate:-9deg}to{rotate:11deg}}
+@keyframes nyx-stride{from{rotate:-17deg}to{rotate:18deg}}
+@keyframes nyx-ear{0%,40%,50%,100%{rotate:0}44%{rotate:-8deg}47%{rotate:6deg}}
+@keyframes nyx-frame{from{opacity:.36}to{opacity:.85}}
+@keyframes nyx-beam{from{opacity:.18;translate:0 0}to{opacity:.7;translate:30% 0}}
+@keyframes nyx-nebula-drift{from{transform:translate3d(-3%,0,0) scale(.91)}to{transform:translate3d(8%,4%,0) scale(1.14)}}
+@keyframes nyx-constellation-float{from{translate:0 -8px}to{translate:12px 12px}}
+@keyframes nyx-link-move{to{stroke-dashoffset:-120}}
+@keyframes nyx-point-pulse{from{opacity:.3}to{opacity:1}}
+@keyframes nyx-ring-orbit{to{transform:rotate(360deg)}}
+@keyframes nyx-comet{0%,76%{opacity:0;transform:translate3d(-14vw,6vh,0) rotate(-17deg)}79%{opacity:.82}86%{opacity:0;transform:translate3d(116vw,-12vh,0) rotate(-17deg)}100%{opacity:0;transform:translate3d(116vw,-12vh,0) rotate(-17deg)}}
+@keyframes nyx-lantern-float{from{opacity:.34;transform:translate3d(-6px,9px,0) scale(.86)}to{opacity:.8;transform:translate3d(8px,-9px,0) scale(1.04)}}
+@keyframes nyx-moth-drift{from{transform:translate3d(-2vw,2vh,0) rotate(-22deg)}to{transform:translate3d(5vw,-4vh,0) rotate(19deg)}}
+@keyframes nyx-wing-left{to{transform:rotate(-23deg) scaleX(.68)}}
+@keyframes nyx-wing-right{to{transform:rotate(23deg) scaleX(.68)}}
+@keyframes nyx-sparkle{0%,100%{opacity:0;transform:scale(.25)}35%,60%{opacity:.82;transform:scale(1)}}
+@keyframes nyx-pawstep{0%,9%,100%{opacity:0;scale:.6}14%,29%{opacity:.5;scale:1}40%{opacity:0;scale:1}}
+@keyframes nyx-petal-fall{0%{opacity:0;transform:translate3d(-3vw,-5vh,0) rotate(0)}10%,70%{opacity:.48}100%{opacity:0;transform:translate3d(8vw,70vh,0) rotate(350deg)}}
+@keyframes nyx-sweep{0%,60%{opacity:0;transform:translateX(-120%)}69%{opacity:.8}88%,100%{opacity:0;transform:translateX(120%)}}
+@media(orientation:portrait){
+ .nyx-ring.a{top:29vh;right:4vw}.nyx-ring.b{bottom:19vh;left:4vw}
+ .nyx-constellation.top-left{top:24vh;left:3vw}.nyx-constellation.bottom-right{bottom:18vh;right:0}
+ .nyx-nebula{width:60vw;height:24vh}.nyx-nebula.left{left:-30vw}.nyx-nebula.right{right:-30vw}
+ .nyx-comet{width:22vw}.nyx-pawprint{bottom:3vh}
+}
+@media(prefers-reduced-motion:reduce){.nyx-magic,.nyx-trails,.nyx-orbits,.nyx-paws{display:none!important}}
