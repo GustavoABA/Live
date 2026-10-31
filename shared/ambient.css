@@ -101,3 +101,10 @@ body.halloween .scene[data-scene="9"] .amb-root{opacity:.53}
 /* Independent animation lifecycle for the standalone Halloween countdown. */
 body.amb-hidden .amb-root *,body.amb-hidden .amb-root *::before,body.amb-hidden .amb-root *::after{animation-play-state:paused!important}
 body.amb-hidden .amb-root .amb-portal{opacity:0}
+
+/* Force poison-green scene accent above per-scene lavender variables. */
+body.halloween:not(.halloween-special) .scene{--accent:#9cf36b!important}
+body.halloween:not(.halloween-special) .eyebrow{color:#b9ff9d}
+body.halloween:not(.halloween-special) .rule{color:#d1ffa0}
+body.halloween:not(.halloween-special) .scene-index span{color:#a8dca8}
+body.halloween:not(.halloween-special) .brand span{color:#bce89e}
