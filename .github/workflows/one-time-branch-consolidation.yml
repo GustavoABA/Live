@@ -1,0 +1,92 @@
+name: One-time branch consolidation
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  consolidate:
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'chore: consolidate repository branches once'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Safely archive legacy heads and prune redundant branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="$GH_REPO"
+          for keep in main AI-Working; do
+            gh api "repos/$repo/git/ref/heads/$keep" --jq '.object.sha' >/dev/null
+          done
+          # Preflight ALL expected refs. No deletions if an AI/user branch advanced.
+          while IFS='|' read -r branch expected; do
+            [[ -n "$branch" ]] || continue
+            current="$(gh api "repos/$repo/git/ref/heads/$branch" --jq '.object.sha')"
+            if [[ "$current" != "$expected" ]]; then
+              echo "::error::Branch $branch changed (was $expected, now $current); aborting cleanup."
+              exit 1
+            fi
+          done <<'EXPECTED_BRANCHES'
+          feat/adam-blue-moon-overlays|c5c05a506b4f6fbbf86c1a9d68d231ea9a7dd32c
+          feat/adam-goatfire-scene-structure|a30dadad129dea96478646b9f3fff427446a35d8
+          feat/adicionar-18-fanarts-20261018|21e7a073fdead43b4aa445da7c1490438df7c4eb
+          feat/fanart-caderno-colorido-outubro|25ce0da7fcb521624415cd052389317eadbbe00b
+          feat/fanarts-fullscreen-single-card|77bdcaef4c1f45ce5649c633c1952846beb5b005
+          feat/galeria-fanarts-iniciando|44590059d3c9e9814a71af74dc2bf351891f44f7
+          feat/nihilguh-brasil-15-nov-2026|1d91505362f3ab97d152644c824e7a305e1a9c79
+          feat/nihilguh-halloween-midnight-ambient-hyperframes|a7e307dc42ad6fca9bd50da6f7316b94b8d6919f
+          feat/nihilguh-midnight-cinematic-cats|d5da1bf35538c05ebc1f39441b386d9a978ad9e3
+          fix/brasil-layering-master-clock-v2|8e9b61449f83550d2f2792a434202e569c664172
+          redesign/assets-real-v3|4091c4641da34e4ac259220fd2d4b6c1ad5e21db
+          redesign/wonderland-clean-v2|5206a3701840c5998e455938c2cf6b45aaafad1e
+          refactor/obs-browser-performance|19cac8ccf4ec07629c7ef91c5f237f7d1ed56728
+          EXPECTED_BRANCHES
+
+          # These are old, unmerged/independent experiments. Save recoverable
+          # commit pointers as TAGS, not working branches, before pruning.
+          while IFS='|' read -r branch commit tag; do
+            [[ -n "$branch" ]] || continue
+            ref="refs/tags/archive/2026-11-01/$tag"
+            if ! gh api "repos/$repo/git/ref/tags/archive/2026-11-01/$tag" >/dev/null 2>&1; then
+              gh api -X POST "repos/$repo/git/refs" -f ref="$ref" -f sha="$commit" >/dev/null
+            fi
+            echo "Archived $branch as $ref"
+          done <<'ARCHIVES'
+          redesign/assets-real-v3|4091c4641da34e4ac259220fd2d4b6c1ad5e21db|assets-real-v3
+          redesign/wonderland-clean-v2|5206a3701840c5998e455938c2cf6b45aaafad1e|wonderland-clean-v2
+          refactor/obs-browser-performance|19cac8ccf4ec07629c7ef91c5f237f7d1ed56728|obs-browser-performance
+          ARCHIVES
+
+          # Old PR #1 predates the current architecture and must not be merged
+          # blindly into the current theme engine. Close as superseded.
+          gh api -X PATCH "repos/$repo/pulls/1" -f state=closed >/dev/null
+
+          while IFS='|' read -r branch expected; do
+            [[ -n "$branch" ]] || continue
+            gh api -X DELETE "repos/$repo/git/refs/heads/$branch" >/dev/null
+            echo "Pruned: $branch"
+          done <<'EXPECTED_BRANCHES'
+          feat/adam-blue-moon-overlays|c5c05a506b4f6fbbf86c1a9d68d231ea9a7dd32c
+          feat/adam-goatfire-scene-structure|a30dadad129dea96478646b9f3fff427446a35d8
+          feat/adicionar-18-fanarts-20261018|21e7a073fdead43b4aa445da7c1490438df7c4eb
+          feat/fanart-caderno-colorido-outubro|25ce0da7fcb521624415cd052389317eadbbe00b
+          feat/fanarts-fullscreen-single-card|77bdcaef4c1f45ce5649c633c1952846beb5b005
+          feat/galeria-fanarts-iniciando|44590059d3c9e9814a71af74dc2bf351891f44f7
+          feat/nihilguh-brasil-15-nov-2026|1d91505362f3ab97d152644c824e7a305e1a9c79
+          feat/nihilguh-halloween-midnight-ambient-hyperframes|a7e307dc42ad6fca9bd50da6f7316b94b8d6919f
+          feat/nihilguh-midnight-cinematic-cats|d5da1bf35538c05ebc1f39441b386d9a978ad9e3
+          fix/brasil-layering-master-clock-v2|8e9b61449f83550d2f2792a434202e569c664172
+          redesign/assets-real-v3|4091c4641da34e4ac259220fd2d4b6c1ad5e21db
+          redesign/wonderland-clean-v2|5206a3701840c5998e455938c2cf6b45aaafad1e
+          refactor/obs-browser-performance|19cac8ccf4ec07629c7ef91c5f237f7d1ed56728
+          EXPECTED_BRANCHES
+
+          # Validate exact remaining branches; do not guess or silently succeed.
+          remaining="$(gh api "repos/$repo/branches?per_page=100" --jq '[.[].name] | sort | join(",")')"
+          echo "Remaining: $remaining"
+          [[ "$remaining" == "AI-Working,main" ]] || { echo "::error::Unexpected branch refs"; exit 1; }
