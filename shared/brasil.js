@@ -67,8 +67,8 @@
     '<circle cx="62" cy="36" r="19" fill="#ba825e"/>'+
     '<path d="M44 35Q39 14 59 14Q85 10 83 34Q75 26 61 26Q51 25 44 35Z" fill="#1d1c27"/>'+
     '<circle cx="73" cy="38" r="2.1" fill="#162438"/><path d="M68 48Q76 53 82 46" fill="none" stroke="#7d4033" stroke-width="1.6"/>'+
-    '<g class="br-handflag"><path d="M102 45L109 -82" stroke="#ece6bd" stroke-width="4" stroke-linecap="round"/>'+
-    '<g transform="translate(108,-79) scale(.33)"><rect width="240" height="160" fill="#099749"/>'+
+    '<g class="br-handflag"><path d="M102 45L107 -48" stroke="#ece6bd" stroke-width="4" stroke-linecap="round"/>'+
+    '<g transform="translate(105,-48) scale(.28)"><rect width="240" height="160" fill="#099749"/>'+
     '<polygon points="120,12 228,80 120,148 12,80" fill="#ffe450"/>'+
     '<circle cx="120" cy="80" r="42" fill="#1458a9"/>'+
     '<path d="M80 76Q121 58 161 77L162 91Q119 72 80 89Z" fill="#fff"/>'+
@@ -167,7 +167,7 @@
     master=gsap.to(progress,{
       seconds:CYCLE,duration:CYCLE,ease:'none',repeat:-1,
       onUpdate(){
-        if(!document.hidden)render(typeof master.totalTime==='function'?master.totalTime():progress.seconds);
+        if(!document.hidden)render(master&&typeof master.totalTime==='function'?master.totalTime():progress.seconds);
       }
     });
     window.__brMasterTimeline=master;
