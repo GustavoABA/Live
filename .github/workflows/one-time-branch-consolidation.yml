@@ -9,7 +9,9 @@ permissions:
   pull-requests: write
 jobs:
   consolidate:
-    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'chore: consolidate repository branches once'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.head_commit.message == 'chore: consolidate repository branches once'
     runs-on: ubuntu-latest
     steps:
       - name: Safely archive legacy heads and prune redundant branches
