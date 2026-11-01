@@ -128,3 +128,141 @@ body.brasil .scene[data-scene="0"] .character{left:-7vw;bottom:-32vh;width:min(4
 }
 @media(max-width:700px) and (orientation:portrait){body.brasil .scene[data-scene="0"] .hero-right{top:8vh}body.brasil .scene[data-scene="0"] .hero-right .title{font-size:clamp(43px,9vw,63px)}.br-gallery{top:35vh}.br-badge{font-size:7px}}
 @media(prefers-reduced-motion:reduce){.br-effects *,.br-gallery *{animation:none!important;transition:none!important}}
+
+
+/* ===== V2: VERIFIED SCENE DEPTH CONTRACT =====
+   Backdrop (-5), native atmosphere (1), Brasil decorations (2),
+   character (4), workspace (8), hero (10), gallery/emergency (12),
+   HUD/header/footer (16). Child z-index cannot escape Brasil stack context. */
+body.brasil .scene{isolation:isolate}
+body.brasil .scene > .br-effects{
+  position:absolute;inset:0;z-index:2;
+  overflow:hidden;isolation:isolate;pointer-events:none;
+}
+body.brasil .scene > .atmosphere{z-index:1;pointer-events:none}
+body.brasil .scene > .character{z-index:4}
+body.brasil .scene > .workspace{z-index:8}
+body.brasil .scene > .hero{z-index:10}
+body.brasil .scene > .gameplay-mark{z-index:10}
+body.brasil .scene > .emergency-card{z-index:12}
+body.brasil .scene > .br-gallery{z-index:12}
+body.brasil .scene > .brand,
+body.brasil .scene > .scene-index,
+body.brasil .scene > .footer{z-index:16}
+body.brasil .scene > .ornament-border{z-index:13}
+body.brasil .scene > .noise{z-index:19;opacity:.025;pointer-events:none}
+/* Date is already present in the scene index and main gallery.
+   Remove this duplicate independent badge, which covered right-side panels. */
+body.brasil .scene > .br-date{display:none!important}
+/* All decorative effects must remain behind content, even if animation
+   transform/filter creates a nested stacking context. */
+body.brasil .br-glow,body.brasil .br-ribbon,body.brasil .br-ray{z-index:0}
+body.brasil .br-flags{z-index:1}
+body.brasil .br-particles{z-index:2}
+body.brasil .br-walkers{z-index:3}
+/* Consolidated 24-second master cycle. Even CSS-only fallback stays aligned. */
+body.brasil .br-flag{
+ animation-duration:6s;animation-timing-function:ease-in-out;
+ animation-delay:var(--delay,0s);will-change:transform
+}
+body.brasil .br-flag .br-flag-fabric{animation-duration:3s}
+body.brasil .br-walker{
+ bottom:var(--bottom,1.4vh);width:var(--size,65px);
+ animation-duration:24s;animation-delay:var(--del,0s);
+ max-width:80px
+}
+body.brasil .br-confetti{animation-duration:24s}
+body.brasil .br-spark{animation-duration:6s}
+body.brasil .br-ray{animation-duration:24s}
+body.brasil .br-walker .br-person{transform-box:view-box;transform-origin:50% 50%}
+/* Keep people in a narrow ground-level lane, not crossing the actual
+   content frames or the fanart stage. */
+body.brasil .br-walkers{
+ clip-path:inset(calc(100% - clamp(90px,12vh,146px)) 0 0 0);
+}
+body.brasil .scene[data-scene="3"] .br-walkers,
+body.brasil .scene[data-scene="4"] .br-walkers,
+body.brasil .scene[data-scene="6"] .br-walkers{
+ clip-path:inset(calc(100% - clamp(75px,9vh,115px)) 0 0 0);
+}
+body.brasil .scene[data-scene="1"] .br-flags,
+body.brasil .scene[data-scene="2"] .br-flags,
+body.brasil .scene[data-scene="4"] .br-flags,
+body.brasil .scene[data-scene="6"] .br-flags{
+ opacity:.72;
+}
+/* Reserve central area for the VTuber/chat/video: side decorations only.
+   Does not clip content: mask affects ONLY decorative layer. */
+body.brasil .scene[data-scene="1"] .br-particles,
+body.brasil .scene[data-scene="2"] .br-particles,
+body.brasil .scene[data-scene="4"] .br-particles,
+body.brasil .scene[data-scene="6"] .br-particles{
+ -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 9%,transparent 23%,transparent 77%,#000 91%,#000 100%);
+ mask-image:linear-gradient(90deg,#000 0%,#000 9%,transparent 23%,transparent 77%,#000 91%,#000 100%);
+}
+body.brasil .scene[data-scene="0"] .br-particles{
+ -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 10%,transparent 29%,transparent 83%,#000 100%);
+ mask-image:linear-gradient(90deg,#000 0%,#000 10%,transparent 29%,transparent 83%,#000 100%);
+}
+/* Scene zero has an exclusive art stage, never a second headline on top. */
+body.brasil .scene[data-scene="0"] .hero-right{
+ left:3vw;right:auto;top:43%;width:35vw;max-width:610px;
+ padding:clamp(14px,1.8vw,30px);
+}
+body.brasil .scene[data-scene="0"] .hero-right .title{font-size:clamp(48px,4.9vw,95px)}
+body.brasil .scene[data-scene="0"] .br-gallery{
+ top:17vh;right:3vw;bottom:10vh;width:55vw;
+}
+body.brasil .scene[data-scene="0"] .br-gallery-window{isolation:isolate}
+body.brasil .scene[data-scene="0"] .br-slide{
+ opacity:0;visibility:hidden;transform:none;
+ transition:none;pointer-events:none;will-change:opacity;
+}
+body.brasil .scene[data-scene="0"] .br-slide.active{
+ visibility:visible;transform:none;
+}
+body.brasil .scene[data-scene="0"] .br-slide.br-slogan{
+ overflow:hidden;
+}
+body.brasil .br-slogan-title{
+ font-size:clamp(62px,8vw,156px);
+ line-height:.86;
+ max-width:100%;
+ overflow-wrap:normal;
+}
+body.brasil .br-slide.active .br-slogan-title{
+ animation:br-banner-arrive .75s cubic-bezier(.16,1,.25,1) both;
+}
+body.brasil .br-gallery-progress span{
+ animation:none!important;
+ width:0;
+ will-change:width;
+}
+/* Freeze when browser source hidden or motion reduced, not halfway through fades. */
+body.brasil.br-paused .br-effects *,
+body.brasil.br-paused .br-gallery *,
+body.brasil.obs-paused .br-effects *{
+ animation-play-state:paused!important
+}
+body.brasil.br-motion-off .br-effects *{animation:none!important}
+body.brasil.br-motion-off .br-slide{transition:none!important}
+@media(orientation:portrait){
+ body.brasil .scene[data-scene="0"] .hero-right{
+   left:5vw;right:5vw;top:9vh;width:90vw;max-width:none;
+   text-align:center;transform:none;border-left:0;border-top:2px solid #ffe17c
+ }
+ body.brasil .scene[data-scene="0"] .hero-right .title{font-size:clamp(39px,9vw,72px)}
+ body.brasil .scene[data-scene="0"] .br-gallery{
+   left:4vw;right:4vw;width:92vw;top:36vh;bottom:7vh
+ }
+ body.brasil .br-walkers{
+   clip-path:inset(calc(100% - clamp(74px,7vh,124px)) 0 0 0)
+ }
+ body.brasil .br-walker{max-width:70px;bottom:1vh}
+ body.brasil .br-flag{max-width:110px}
+ body.brasil .scene[data-scene="0"] .br-slogan-title{font-size:clamp(56px,14vw,128px)}
+}
+@media(max-width:700px) and (orientation:portrait){
+ body.brasil .scene[data-scene="0"] .hero-right{top:8vh}
+ body.brasil .scene[data-scene="0"] .br-gallery{top:37vh}
+}

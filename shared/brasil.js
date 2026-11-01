@@ -45,14 +45,16 @@
     '<path class="br-flag-light" d="M7 0Q49 67 6 160H0V0Z" fill="#fff" opacity=".2"/>'+
     '<path d="M235 0Q209 76 236 160H240V0Z" fill="#003e4a" opacity=".14"/></g></svg>';
   // Flags wave at edges, leaving the main viewing area readable.
-  const flagConfig=limited?[[3,19,86,.36],[85,64,86,.32],[91,14,65,.26]]:
-   [[3,18,125,.72],[86,21,135,.64],[8,69,90,.43],[87,68,95,.44],[48,8,57,.27],[45,84,60,.25]];
+  // Flags are anchored to periphery, not the center of any stage or chat area.
+  const flagConfig=limited?[[0,21,68,.30],[92,25,68,.29]]:
+    sceneId===0?[[0,23,88,.44],[92,23,88,.44],[0,68,72,.31],[94,69,70,.30]]:
+    [[0,21,90,.48],[92,24,90,.48],[1,69,67,.32],[95,68,67,.32]];
   const gsapFlags=[];
   flagConfig.forEach(([x,y,size,opacity],i)=>{
     const flag=document.createElement('div');flag.className='br-flag'+(i<2?' flag-corner '+(i?'right':'left'):'');
-    const d=between(3,6);
-    flag.style.cssText='--fx:'+x+'vw;--fy:'+y+'vh;--flag-size:'+size+'px;--fo:'+opacity+';--fd:'+d.toFixed(2)+'s;--delay:-'+(i*1.9)+'s;';
-    flag.innerHTML=flagSVG;flags.append(flag);gsapFlags.push({el:flag,duration:d,phase:random()});
+    const d=6;
+    flag.style.cssText='--fx:'+x+'vw;--fy:'+y+'vh;--flag-size:'+size+'px;--fo:'+opacity+';--fd:'+d.toFixed(2)+'s;--delay:-'+((i%2)*.25)+'s;';
+    flag.innerHTML=flagSVG;flags.append(flag);gsapFlags.push({el:flag,duration:d,phase:(i%2)*.03});
   });
   const personSVG='<svg viewBox="0 0 128 184" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
     '<g class="br-person"><ellipse class="br-shadow" cx="60" cy="176" rx="37" ry="5" fill="#032b2e"/>'+
@@ -65,33 +67,33 @@
     '<circle cx="62" cy="36" r="19" fill="#ba825e"/>'+
     '<path d="M44 35Q39 14 59 14Q85 10 83 34Q75 26 61 26Q51 25 44 35Z" fill="#1d1c27"/>'+
     '<circle cx="73" cy="38" r="2.1" fill="#162438"/><path d="M68 48Q76 53 82 46" fill="none" stroke="#7d4033" stroke-width="1.6"/>'+
-    '<g class="br-handflag"><path d="M102 45L109 -82" stroke="#ece6bd" stroke-width="4" stroke-linecap="round"/>'+
-    '<g transform="translate(108,-79) scale(.33)"><rect width="240" height="160" fill="#099749"/>'+
+    '<g class="br-handflag"><path d="M102 45L107 -48" stroke="#ece6bd" stroke-width="4" stroke-linecap="round"/>'+
+    '<g transform="translate(105,-48) scale(.28)"><rect width="240" height="160" fill="#099749"/>'+
     '<polygon points="120,12 228,80 120,148 12,80" fill="#ffe450"/>'+
     '<circle cx="120" cy="80" r="42" fill="#1458a9"/>'+
     '<path d="M80 76Q121 58 161 77L162 91Q119 72 80 89Z" fill="#fff"/>'+
     '<circle cx="119" cy="61" r="2" fill="#fff"/><circle cx="138" cy="97" r="2" fill="#fff"/></g></g></g></svg>';
   const gsapWalkers=[];
-  const count=low?1:limited?1:high?4:3;
+  const count=low?1:limited?1:high?3:2;
   for(let i=0;i<count;i++){
     const w=document.createElement('div');w.className='br-walker'+((i+sceneId)%2?' reverse':'');
-    const duration=between(25,44);const reverse=w.className.includes('reverse');
-    w.style.cssText='--bottom:'+between(2.3,5.2).toFixed(1)+'vh;--size:'+between(74,105).toFixed(0)+'px;--dur:'+duration.toFixed(1)+'s;--del:-'+between(2,duration).toFixed(1)+'s;--op:'+(limited?.55:.81)+';';
+    const duration=24;const reverse=w.className.includes('reverse');
+    w.style.cssText='--bottom:'+between(0.4,1.4).toFixed(1)+'vh;--size:'+between(59,74).toFixed(0)+'px;--dur:'+duration.toFixed(1)+'s;--del:-'+(i*12)+'s;--op:'+(limited?.55:.81)+';';
     w.innerHTML=personSVG;walkers.append(w);
-    gsapWalkers.push({el:w,duration,phase:random(),reverse});
+    gsapWalkers.push({el:w,duration,phase:i/count,reverse});
   }
   const sparks=low?9:limited?16:high?55:34;
   for(let i=0;i<sparks;i++){
     const node=document.createElement('span');node.className='br-spark';
     node.textContent=['✦','★','✧','·','✺'][i%5];
     const color=['#ffdf4f','#e9ffbf','#4dd999','#73c9ff'][i%4];
-    node.style.cssText='--x:'+between(3,97).toFixed(1)+'%;--y:'+between(9,94).toFixed(1)+'%;--size:'+between(7,22).toFixed(0)+'px;--clr:'+color+';--dur:'+between(4,10).toFixed(1)+'s;--del:-'+between(0,15).toFixed(1)+'s;';
+    node.style.cssText='--x:'+between(3,97).toFixed(1)+'%;--y:'+between(9,94).toFixed(1)+'%;--size:'+between(7,22).toFixed(0)+'px;--clr:'+color+';--dur:'+between(4,10).toFixed(1)+'s;--del:-'+((i%6)*1)+'s;';
     particles.append(node);
   }
   const pieces=low?6:limited?10:high?38:24;
   for(let i=0;i<pieces;i++){
     const el=document.createElement('i');el.className='br-confetti';
-    el.style.cssText='--x:'+between(3,97).toFixed(1)+'%;--w:'+between(3,7).toFixed(0)+'px;--h:'+between(8,16).toFixed(0)+'px;--dur:'+between(10,22).toFixed(1)+'s;--del:-'+between(0,24).toFixed(1)+'s;--clr:'+['#099c55','#ffe36c','#3781d7','#f0fff4'][i%4]+';';
+    el.style.cssText='--x:'+between(3,97).toFixed(1)+'%;--w:'+between(3,7).toFixed(0)+'px;--h:'+between(8,16).toFixed(0)+'px;--dur:'+between(10,22).toFixed(1)+'s;--del:-'+((i%12)*2)+'s;--clr:'+['#099c55','#ffe36c','#3781d7','#f0fff4'][i%4]+';';
     particles.append(el);
   }
   for(let i=0;i<(limited?1:3);i++){
@@ -101,28 +103,93 @@
   }
   const badge=document.createElement('span');badge.className='br-badge';badge.textContent='NihilGuh · Especial Brasil 🇧🇷';root.append(badge);
   scene.append(root);
-  // Browser Source: GSAP timelines when available; CSS keyframes otherwise.
+
+  // Single synchronized motion clock: flags, walkers and art gallery use
+  // the SAME logical elapsed time. GSAP drives it if available; native rAF
+  // does so otherwise. Timing is paused while the OBS source is hidden.
+  const CYCLE=24; // seconds
+  let elapsed=0;
+  const subscribers=new Set();
+  const motionClock={
+    get elapsed(){return elapsed},
+    get cycle(){return CYCLE},
+    subscribe(fn){
+      if(typeof fn!=='function')return ()=>{};
+      subscribers.add(fn);fn(elapsed);
+      return ()=>subscribers.delete(fn);
+    }
+  };
+  window.BrasilMotionClock=motionClock;
+  let master=null;
+  let nativeHandle=0, nativeLast=0;
   const gsap=window.gsap;
-  let loops=[];
-  if(gsap&&!noMotion&&typeof gsap.timeline==='function'){
-    root.classList.add('br-gsap');
-    loops=Array.isArray(window.__timelines)?window.__timelines:(window.__timelines=[]);
-    for(const f of gsapFlags){
-      const t=gsap.timeline({repeat:-1,yoyo:true});
-      t.fromTo(f.el,{skewY:-4,scaleX:.97,rotation:-5},{skewY:4,scaleX:1.03,rotation:5,duration:f.duration,ease:'sine.inOut'});
-      t.progress(f.phase);loops.push(t);
+  const driverAvailable=!noMotion && ((gsap&&typeof gsap.to==='function')||typeof requestAnimationFrame==='function');
+  if(driverAvailable)root.classList.add('br-gsap');
+
+  const render=(seconds)=>{
+    elapsed=Math.max(0,seconds);
+    const t=(elapsed%CYCLE)/CYCLE;
+    // Synchronized six-second fabric rhythm. All flags share the same phase,
+    // with only a small offset to keep them organic.
+    for(let i=0;i<gsapFlags.length;i++){
+      const wave=t*CYCLE/6*2*Math.PI+gsapFlags[i].phase*2*Math.PI;
+      const rotation=Math.sin(wave)*3.3;
+      const skew=Math.sin(wave+.3)*2.4;
+      gsapFlags[i].el.style.transform=
+        'rotate('+rotation.toFixed(3)+'deg) skewY('+skew.toFixed(3)+'deg)';
     }
-    for(const w of gsapWalkers){
-      const t=gsap.timeline({repeat:-1});
-      t.fromTo(w.el,{x:w.reverse?'122vw':'-22vw'},{x:w.reverse?'-22vw':'122vw',duration:w.duration,ease:'none'});
-      t.progress(w.phase);loops.push(t);
+    // Walkers use lanes along the bottom, and turn toward the actual direction.
+    // Identical cycle durations prevent walkers from progressively drifting.
+    for(let i=0;i<gsapWalkers.length;i++){
+      const w=gsapWalkers[i];
+      const phase=(t+w.phase)%1;
+      const xpos=w.reverse?122-144*phase:-22+144*phase;
+      w.el.style.transform='translate3d('+xpos.toFixed(3)+'vw,0,0)';
     }
+    for(const callback of subscribers){
+      try{callback(elapsed)}catch(error){console.warn('[Brasil] subscriber:',error)}
+    }
+  };
+
+  const pauseNative=()=>{if(nativeHandle){cancelAnimationFrame(nativeHandle);nativeHandle=0;}nativeLast=0};
+  const nativeStep=(timestamp)=>{
+    if(document.hidden||noMotion)return;
+    if(!nativeLast)nativeLast=timestamp;
+    const delta=Math.min((timestamp-nativeLast)/1000,.08);
+    nativeLast=timestamp;
+    render(elapsed+Math.max(0,delta));
+    nativeHandle=requestAnimationFrame(nativeStep);
+  };
+  if(!noMotion&&gsap&&typeof gsap.to==='function'){
+    // GSAP's global timeline is already paused/resumed by shared/scene.js,
+    // so the decoration clock cannot outrun the original scene animation.
+    const progress={seconds:0};
+    master=gsap.to(progress,{
+      seconds:CYCLE,duration:CYCLE,ease:'none',repeat:-1,
+      onUpdate(){
+        if(!document.hidden)render(master&&typeof master.totalTime==='function'?master.totalTime():progress.seconds);
+      }
+    });
+    window.__brMasterTimeline=master;
+  }else if(!noMotion&&typeof requestAnimationFrame==='function'){
+    nativeHandle=requestAnimationFrame(nativeStep);
+  }else{
+    render(0);
   }
-  // Source visibility is managed by the OBS browser; pause effects while hidden.
+
   const update=()=>{
     const hidden=document.hidden;
     document.body.classList.toggle('br-paused',hidden);
-    if(loops.length)for(const t of loops){if(hidden&&typeof t.pause==='function')t.pause();else if(!hidden&&typeof t.resume==='function')t.resume();}
+    if(master){
+      if(hidden&&typeof master.pause==='function')master.pause();
+      else if(!hidden&&typeof master.resume==='function')master.resume();
+    }else if(hidden){pauseNative()}
+    else if(!noMotion&&!nativeHandle&&typeof requestAnimationFrame==='function'){
+      nativeHandle=requestAnimationFrame(nativeStep);
+    }
   };
-  document.addEventListener('visibilitychange',update);update();
+  document.addEventListener('visibilitychange',update);
+  window.addEventListener('pagehide',()=>{pauseNative();if(master&&typeof master.pause==='function')master.pause()});
+  render(0);
+  update();
 })();
